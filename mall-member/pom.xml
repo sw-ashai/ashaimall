@@ -18,6 +18,12 @@
         <spring-cloud.version>2020.0.4</spring-cloud.version>
     </properties>
     <dependencies>
+        <!--         引入公用依赖-->
+        <dependency>
+            <groupId>icu.ashai</groupId>
+            <artifactId>mall-common</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
