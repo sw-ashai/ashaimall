@@ -1,19 +1,15 @@
 package icu.ashai.mall.member.controller;
 
-import java.util.Arrays;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import icu.ashai.mall.member.entity.MemberEntity;
-import icu.ashai.mall.member.service.MemberService;
 import icu.ashai.common.utils.PageUtils;
 import icu.ashai.common.utils.R;
+import icu.ashai.mall.member.entity.MemberEntity;
+import icu.ashai.mall.member.feign.CouponFeignService;
+import icu.ashai.mall.member.service.MemberService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
+import java.util.Map;
 
 
 
@@ -29,6 +25,20 @@ import icu.ashai.common.utils.R;
 public class MemberController {
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private CouponFeignService couponFeignService;
+
+    @GetMapping("/test")
+    public R test(){
+        MemberEntity memberEntity = new MemberEntity();
+        memberEntity.setNickname("法外狂徒");
+
+        R r = couponFeignService.memberCoupons();
+
+        return R.ok().put("member",memberEntity).put("coupons",r.get("coupons"));
+    }
+
 
     /**
      * 列表

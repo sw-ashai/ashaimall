@@ -38,3 +38,4 @@ target
 hs_err_pid*
 
 application.yml
+rebel.xml
