@@ -1,4 +1,4 @@
-package icu.shai.mall.coupon;
+package icu.ashai.mall.coupon;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
