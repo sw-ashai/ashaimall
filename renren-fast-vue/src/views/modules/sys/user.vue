@@ -118,7 +118,7 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/sys/user/list'),
+          url: this.$http.adornUrl('/admin/sys/user/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -169,7 +169,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/sys/user/delete'),
+            url: this.$http.adornUrl('/admin/sys/user/delete'),
             method: 'post',
             data: this.$http.adornData(userIds, false)
           }).then(({data}) => {

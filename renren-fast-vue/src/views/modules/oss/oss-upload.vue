@@ -32,7 +32,7 @@
     },
     methods: {
       init (id) {
-        this.url = this.$http.adornUrl(`/sys/oss/upload?token=${this.$cookie.get('token')}`)
+        this.url = this.$http.adornUrl(`/admin/sys/oss/upload?token=${this.$cookie.get('token')}`)
         this.visible = true
       },
       // 上传之前

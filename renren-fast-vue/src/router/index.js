@@ -49,7 +49,7 @@ const mainRoutes = {
 }
 
 const router = new Router({
-  mode: 'hash',
+  mode: 'history',
   scrollBehavior: () => ({ y: 0 }),
   isAddDynamicMenuRoutes: false, // 是否已经添加动态(菜单)路由
   routes: globalRoutes.concat(mainRoutes)
@@ -63,7 +63,7 @@ router.beforeEach((to, from, next) => {
     next()
   } else {
     http({
-      url: http.adornUrl('/sys/menu/nav'),
+      url: http.adornUrl('/admin/sys/menu/nav'),
       method: 'get',
       params: http.adornParams()
     }).then(({data}) => {
@@ -148,10 +148,10 @@ function fnAddDynamicMenuRoutes (menuList = [], routes = []) {
       { path: '*', redirect: { name: '404' } }
     ])
     sessionStorage.setItem('dynamicMenuRoutes', JSON.stringify(mainRoutes.children || '[]'))
-    console.log('\n')
-    console.log('%c!<-------------------- 动态(菜单)路由 s -------------------->', 'color:blue')
-    console.log(mainRoutes.children)
-    console.log('%c!<-------------------- 动态(菜单)路由 e -------------------->', 'color:blue')
+    // console.log('\n')
+    // console.log('%c!<-------------------- 动态(菜单)路由 s -------------------->', 'color:blue')
+    // console.log(mainRoutes.children)
+    // console.log('%c!<-------------------- 动态(菜单)路由 e -------------------->', 'color:blue')
   }
 }
 

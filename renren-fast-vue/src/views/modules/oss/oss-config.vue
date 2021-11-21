@@ -95,7 +95,7 @@
       init (id) {
         this.visible = true
         this.$http({
-          url: this.$http.adornUrl('/sys/oss/config'),
+          url: this.$http.adornUrl('/admin/sys/oss/config'),
           method: 'get',
           params: this.$http.adornParams()
         }).then(({data}) => {
@@ -107,7 +107,7 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl('/sys/oss/saveConfig'),
+              url: this.$http.adornUrl('/admin/sys/oss/saveConfig'),
               method: 'post',
               data: this.$http.adornData(this.dataForm)
             }).then(({data}) => {

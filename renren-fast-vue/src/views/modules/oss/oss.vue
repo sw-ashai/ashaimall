@@ -95,7 +95,7 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/sys/oss/list'),
+          url: this.$http.adornUrl('/admin/sys/oss/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -152,7 +152,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/sys/oss/delete'),
+            url: this.$http.adornUrl('/admin/sys/oss/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {

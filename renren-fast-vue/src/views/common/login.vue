@@ -70,7 +70,7 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl('/sys/login'),
+              url: this.$http.adornUrl('/admin/sys/login'),
               method: 'post',
               data: this.$http.adornData({
                 'username': this.dataForm.userName,
@@ -93,7 +93,7 @@
       // 获取验证码
       getCaptcha () {
         this.dataForm.uuid = getUUID()
-        this.captchaPath = this.$http.adornUrl(`/captcha.jpg?uuid=${this.dataForm.uuid}`)
+        this.captchaPath = this.$http.adornUrl(`/admin/captcha.jpg?uuid=${this.dataForm.uuid}`)
       }
     }
   }
