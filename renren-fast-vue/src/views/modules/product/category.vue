@@ -1,6 +1,6 @@
 <template>
   <div class="mod-config">
-    <el-form :inline="true"  @keyup.enter.native="getDataList()">
+    <el-form :inline="true" @keyup.enter.native="getDataList()">
       <el-form-item>
         <el-button
             type="primary"
@@ -17,8 +17,8 @@
     </el-form>
 
     <el-tree :data="dataList" :props="defaultProps" :expand-on-click-node="false" node-key="catId" show-checkbox
-             style="width: 30%" @check="selectionChange" :default-expanded-keys="expandedKeys" draggable>
-      <!--  TODO: 2021/11/22 上午 12:30 Ashai 拖拽改变顺序功能待实现 -->
+             style="width: 30%" @check="selectionChange" :default-expanded-keys="expandedKeys" draggable
+             :allow-drop="allowDrop" @node-drop="handleDrop">
        <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}</span>
         <span>
@@ -57,15 +57,21 @@ import AddOrUpdate from './category-add-or-update'
 export default {
   data () {
     return {
+      // 所有在展开状态的节点key
       expandedKeys: [],
+      // 数据列表
       dataList: [],
       pageIndex: 1,
       pageSize: 10,
       totalPage: 0,
+      // 遮罩
       dataListLoading: false,
+      // 选中id
       ids: [],
       updateData: {},
       parentCids: [],
+      maxLevel: 0,
+      updateNodes: [],
       addOrUpdateVisible: false,
       defaultProps: {
         children: 'children',
@@ -169,7 +175,106 @@ export default {
           }
         })
       })
+    },
+    /**
+     * 拖动
+     * @param draggingNode
+     * @param dropNode
+     * @param type
+     * @returns {boolean}
+     */
+    allowDrop (draggingNode, dropNode, type) {
+
+      this.countNodeLevel(draggingNode.data)
+
+      let deep = this.maxLevel - draggingNode.data.catLevel + 1
+
+      if (type === 'inner') {
+        return deep + dropNode.level <= 3
+      } else {
+        return deep + dropNode.parent.level <= 3
+      }
+    },
+    /**
+     * 计算节点深度
+     * @param node
+     */
+    countNodeLevel (node) {
+      if (node.children != null && node.children.length > 0) {
+
+        for (let i = 0; i < node.children.length; i++) {
+          if (node.children[i].catLevel > this.maxLevel) {
+            this.maxLevel = node.children[i].catLevel
+          }
+          this.countNodeLevel(node.children[i])
+        }
+
+      }
+    },
+    /**
+     * 拖拽完成
+     * @param draggingNode 正在拖动节点
+     * @param dropNode 托东
+     * @param dropType
+     * @param ev
+     */
+    handleDrop (draggingNode, dropNode, dropType, ev) {
+      this.updateNodes = []
+      let pCid = 0
+      let siblings = null
+      if (dropType === 'before' || dropType === 'after') {
+        pCid = dropNode.parent.data.catId === undefined ? 0 : dropNode.parent.data.catId
+        siblings = dropNode.parent.childNodes
+      } else {
+        pCid = dropNode.data.catId
+        siblings = dropNode.childNodes
+
+      }
+
+      for (let i = 0; i < siblings.length; i++) {
+        //如果遍历的是当前节点
+        if (siblings[i].data.catId === draggingNode.data.catId) {
+          let catLevel = draggingNode.level
+          // 当前层级发生改变
+          if (siblings[i].level !== draggingNode.level) {
+            // 修改层级
+            catLevel = siblings[i].level
+            // 修改当前节点的子层级
+            this.updateChildNodeLevel(siblings[i])
+          }
+
+          this.updateNodes.push({
+            catId: siblings[i].data.catId,
+            sort: i,
+            parentCid: pCid,
+            catLevel: catLevel
+          })
+        } else {
+          this.updateNodes.push({
+            catId: siblings[i].data.catId,
+            sort: i
+          })
+        }
+      }
+
+      // TODO: 2021/11/24 上午 12:03 Ashai 剩余拖拽后接口的请求
+      console.log(this.updateNodes)
+    },
+    /**
+     * 修改子节点层级
+     * @param node
+     */
+    updateChildNodeLevel (node) {
+      if (node.childNodes.length > 0) {
+        node.childNodes.forEach(childNode => {
+          let cNode = childNode.data
+          this.updateNodes.push({catId: cNode.catId, catLevel: childNode.level})
+          this.updateChildNodeLevel(childNode)
+        })
+      }
+
     }
+
   }
 }
 </script>
