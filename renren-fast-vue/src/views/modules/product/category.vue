@@ -1,23 +1,40 @@
 <template>
   <div class="mod-config">
-    <el-form :inline="true" @keyup.enter.native="getDataList()">
-      <el-form-item>
+
+    <el-row>
+      <el-col :span="3" >
+        <el-switch v-model="draggable" active-text="开启拖拽" inactive-text="关闭拖拽"/>
+      </el-col>
+      <el-col :span="3">
+        <el-button
+            v-if="draggable"
+            type="primary"
+            @click="batchSave"
+        >批量保存
+        </el-button>
+      </el-col>
+      <el-col :span="3">
         <el-button
             type="primary"
             @click="append({catId: 0})"
         >新增一级目录
         </el-button>
+      </el-col>
+      <el-col :span="3">
         <el-button
             type="danger"
             @click="remove()"
             :disabled="ids.length <= 0"
         >批量删除
         </el-button>
-      </el-form-item>
-    </el-form>
+      </el-col>
+
+
+    </el-row>
 
     <el-tree :data="dataList" :props="defaultProps" :expand-on-click-node="false" node-key="catId" show-checkbox
-             style="width: 30%" @check="selectionChange" :default-expanded-keys="expandedKeys" draggable
+             style="width: 30%;margin-top: 20px" @check="selectionChange" :default-expanded-keys="expandedKeys"
+             :draggable="draggable"
              :allow-drop="allowDrop" @node-drop="handleDrop">
        <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}</span>
@@ -61,6 +78,7 @@ export default {
       expandedKeys: [],
       // 数据列表
       dataList: [],
+      draggable: false,
       pageIndex: 1,
       pageSize: 10,
       totalPage: 0,
@@ -168,6 +186,8 @@ export default {
               onClose: () => {
                 this.expandedKeys = parentCid
                 this.getDataList()
+                this.maxLevel = 0
+                this.updateNodes = []
               }
             })
           } else {
@@ -187,7 +207,7 @@ export default {
 
       this.countNodeLevel(draggingNode.data)
 
-      let deep = this.maxLevel - draggingNode.data.catLevel + 1
+      let deep = Math.abs(this.maxLevel - draggingNode.level) + 1
 
       if (type === 'inner') {
         return deep + dropNode.level <= 3
@@ -200,13 +220,13 @@ export default {
      * @param node
      */
     countNodeLevel (node) {
-      if (node.children != null && node.children.length > 0) {
+      if (node.childNodes != null && node.childNodes.length > 0) {
 
-        for (let i = 0; i < node.children.length; i++) {
-          if (node.children[i].catLevel > this.maxLevel) {
-            this.maxLevel = node.children[i].catLevel
+        for (let i = 0; i < node.childNodes.length; i++) {
+          if (node.childNodes[i].level > this.maxLevel) {
+            this.maxLevel = node.childNodes[i].catLevel
           }
-          this.countNodeLevel(node.children[i])
+          this.countNodeLevel(node.childNodes[i])
         }
 
       }
@@ -219,7 +239,6 @@ export default {
      * @param ev
      */
     handleDrop (draggingNode, dropNode, dropType, ev) {
-      this.updateNodes = []
       let pCid = 0
       let siblings = null
       if (dropType === 'before' || dropType === 'after') {
@@ -257,8 +276,25 @@ export default {
         }
       }
 
-      // TODO: 2021/11/24 上午 12:03 Ashai 剩余拖拽后接口的请求
-      console.log(this.updateNodes)
+
+    },
+    batchSave(){
+      this.$http({
+        url: this.$http.adornUrl('/product/category/update/sort'),
+        method: 'post',
+        data: this.$http.adornData(this.updateNodes, false)
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.$message({
+            message: '操作成功',
+            type: 'success',
+            duration: 1500,
+          })
+          this.getDataList()
+        } else {
+          this.$message.error(data.msg)
+        }
+      })
     },
     /**
      * 修改子节点层级
