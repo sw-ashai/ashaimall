@@ -50,7 +50,10 @@
         prop="showStatus"
         header-align="center"
         align="center"
-        label="显示状态[0-不显示；1-显示]">
+        label="显示状态">
+        <template slot-scope="scope">
+          <el-switch @change="updateBrandStatus(scope.row)" inactive-color="red" :active-value="1" :inactive-value="0" v-model="scope.row.showStatus"></el-switch>
+        </template>
       </el-table-column>
       <el-table-column
         prop="firstLetter"
@@ -186,6 +189,30 @@
               this.$message.error(data.msg)
             }
           })
+        })
+      },
+      /**
+       * 修改当前行的状态
+       */
+      updateBrandStatus(row){
+        let {brandId,showStatus} = row
+        this.$http({
+          url: this.$http.adornUrl('/product/brand/update'),
+          method: 'post',
+          data: this.$http.adornData({brandId,showStatus}, false)
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: '操作成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getDataList()
+              }
+            })
+          } else {
+            this.$message.error(data.msg)
+          }
         })
       }
     }
