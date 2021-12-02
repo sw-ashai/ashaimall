@@ -1,19 +1,14 @@
 package icu.ashai.mall.product.controller;
 
-import java.util.Arrays;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import icu.ashai.mall.product.entity.BrandEntity;
-import icu.ashai.mall.product.service.BrandService;
 import icu.ashai.common.utils.PageUtils;
 import icu.ashai.common.utils.R;
+import icu.ashai.mall.product.entity.BrandEntity;
+import icu.ashai.mall.product.service.BrandService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
+import java.util.Map;
 
 
 

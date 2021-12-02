@@ -29,6 +29,7 @@
         <module>renren-fast</module>
         <module>renren-generator</module>
         <module>mall-common</module>
+        <module>mall-third-party</module>
     </modules>
 
 </project>

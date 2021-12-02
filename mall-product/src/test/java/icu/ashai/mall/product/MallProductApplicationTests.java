@@ -15,6 +15,7 @@ class MallProductApplicationTests {
     @Autowired
     private BrandService brandService;
 
+
     @Test
     void contextLoads() {
         BrandEntity brandEntity = new BrandEntity();
@@ -24,5 +25,6 @@ class MallProductApplicationTests {
         List<BrandEntity> brand_id = brandService.list(new QueryWrapper<BrandEntity>().eq("brand_id", 1));
         System.out.println(brand_id);
     }
+
 
 }
