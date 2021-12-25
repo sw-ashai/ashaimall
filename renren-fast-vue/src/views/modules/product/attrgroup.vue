@@ -1,11 +1,11 @@
 <template>
-    <el-row :gutter="20">
-      <el-col :span="6">
-        <category @node-click="nodeClick"></category>
+  <el-row :gutter="20">
+    <el-col :span="6">
+      <category @node-click="nodeClick"></category>
 
-      </el-col>
-      <el-col :span="18">
-        <div class="mod-config">
+    </el-col>
+    <el-col :span="18">
+      <div class="mod-config">
         <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
           <el-form-item>
             <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
@@ -46,9 +46,9 @@
         </el-pagination>
         <!-- 弹窗, 新增 / 修改 -->
         <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
-        </div>
-      </el-col>
-    </el-row>
+      </div>
+    </el-col>
+  </el-row>
 </template>
 
 <script>
@@ -58,6 +58,7 @@ import Category from '@/views/modules/common/category'
 export default {
   data () {
     return {
+      catId: 0,
       dataForm: {
         key: ''
       },
@@ -82,7 +83,7 @@ export default {
     getDataList () {
       this.dataListLoading = true
       this.$http({
-        url: this.$http.adornUrl('/product/attrgroup/list'),
+        url: this.$http.adornUrl('/product/attrgroup/list/' + this.catId),
         method: 'get',
         params: this.$http.adornParams({
           'page': this.pageIndex,
@@ -152,8 +153,11 @@ export default {
         })
       })
     },
-    nodeClick(data,node,component){
-      console.log(data)
+    nodeClick (data, node, component) {
+      if (node.level === 3){
+        this.catId = data.catId
+        this.getDataList()
+      }
     }
   }
 }

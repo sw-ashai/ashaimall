@@ -1,20 +1,38 @@
 package icu.ashai.mall.product.service.impl;
 
-import org.springframework.stereotype.Service;
-import java.util.Map;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import icu.ashai.common.utils.PageUtils;
 import icu.ashai.common.utils.Query;
-
 import icu.ashai.mall.product.dao.AttrGroupDao;
 import icu.ashai.mall.product.entity.AttrGroupEntity;
+import icu.ashai.mall.product.entity.CategoryEntity;
 import icu.ashai.mall.product.service.AttrGroupService;
+import icu.ashai.mall.product.service.CategoryService;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 
 @Service("attrGroupService")
 public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEntity> implements AttrGroupService {
+
+    /**
+     * 三级分类service
+     */
+    private final CategoryService categoryService;
+
+    @Autowired
+    public AttrGroupServiceImpl(CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -25,5 +43,67 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
         return new PageUtils(page);
     }
+
+    @Override
+    public PageUtils queryPage(Map<String, Object> params, Long catelogId) {
+
+        LambdaQueryWrapper<AttrGroupEntity> wrapper;
+
+        if (catelogId.equals(0L)) {
+            wrapper = new LambdaQueryWrapper<>();
+        } else {
+            String key = (String) params.get("key");
+            wrapper = new LambdaQueryWrapper<AttrGroupEntity>().eq(AttrGroupEntity::getCatelogId, catelogId);
+            if (StringUtils.isNotEmpty(key)) {
+                wrapper.and(attrGroupEntityLambdaQueryWrapper -> {
+                    attrGroupEntityLambdaQueryWrapper.eq(AttrGroupEntity::getAttrGroupId, key).or().like(AttrGroupEntity::getAttrGroupName, key);
+                });
+            }
+
+
+        }
+        IPage<AttrGroupEntity> page = this.page(
+                new Query<AttrGroupEntity>().getPage(params),
+                wrapper
+        );
+        return new PageUtils(page);
+    }
+
+    @Override
+    public AttrGroupEntity getInfo(Long attrGroupId) {
+
+        List<Long> paths = new LinkedList<>();
+
+        AttrGroupEntity attrGroup = getById(attrGroupId);
+
+        CategoryEntity category = categoryService.getById(attrGroup.getCatelogId());
+
+        paths = getCategoryPath(category, paths);
+        Collections.reverse(paths);
+
+        attrGroup.setCatelogPath(paths.toArray(new Long[0]));
+
+        return attrGroup;
+    }
+
+    /**
+     * 获取分类路径
+     *
+     * @param category 分类对象
+     * @param paths    路径集合
+     * @return 查询结果
+     */
+
+    private List<Long> getCategoryPath(CategoryEntity category, List<Long> paths) {
+
+        paths.add(category.getCatId());
+
+        if (category.getParentCid().equals(0L)) {
+            return paths;
+        }
+
+        return getCategoryPath(categoryService.getById(category.getParentCid()), paths);
+    }
+
 
 }
