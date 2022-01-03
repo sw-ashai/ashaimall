@@ -7,7 +7,10 @@ import icu.ashai.common.utils.PageUtils;
 import icu.ashai.common.utils.Query;
 import icu.ashai.mall.product.dao.CategoryDao;
 import icu.ashai.mall.product.entity.CategoryEntity;
+import icu.ashai.mall.product.service.CategoryBrandRelationService;
 import icu.ashai.mall.product.service.CategoryService;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -22,6 +25,13 @@ import java.util.stream.Collectors;
  */
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
+
+    private final CategoryBrandRelationService categoryBrandRelationService;
+
+    @Autowired
+    public CategoryServiceImpl(CategoryBrandRelationService categoryBrandRelationService) {
+        this.categoryBrandRelationService = categoryBrandRelationService;
+    }
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -50,10 +60,19 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         baseMapper.deleteBatchIds(catIds);
     }
 
+    @Override
+    public void updateDetail(CategoryEntity category) {
+        this.updateById(category);
+        if (StringUtils.isNotEmpty(category.getName())) {
+            categoryBrandRelationService.updateCategory(category.getCatId(), category.getName());
+        }
+    }
+
 
     /**
      * 获取子菜单
-     * @param menu 需要获取子菜单的对象
+     *
+     * @param menu    需要获取子菜单的对象
      * @param allMenu 整个菜单列表
      * @return 获取到的子菜单
      */

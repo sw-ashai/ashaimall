@@ -53,18 +53,6 @@ public class BrandController {
      */
     @PostMapping("/save")
     public R save(@Validated(AddGroup.class) @RequestBody BrandEntity brand /*, BindingResult result*/) {
-//        if (result.hasErrors()) {
-//            HashMap<String, Object> map = new HashMap<>();
-//            result.getFieldErrors().forEach(item -> {
-////                获取到错误提示
-//                String defaultMessage = item.getDefaultMessage();
-//                String field = item.getField();
-//                map.put(field, defaultMessage);
-//            });
-//            return R.error(400, "提交数据不合法").put("data", map);
-//        } else {
-//            brandService.save(brand);
-//        }
         brandService.save(brand);
         return R.ok();
     }
@@ -74,7 +62,7 @@ public class BrandController {
      */
     @RequestMapping("/update")
     public R update(@Validated(UpdateGroup.class) @RequestBody BrandEntity brand) {
-        brandService.updateById(brand);
+        brandService.updateDetail(brand);
 
         return R.ok();
     }

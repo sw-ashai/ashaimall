@@ -32,8 +32,16 @@ public interface CategoryService extends IService<CategoryEntity> {
 
     /**
      * 批量删除菜单
+     *
      * @param catIds 需要删除的列表
      */
     void removeMenuByIds(List<Long> catIds);
+
+    /**
+     * 更新所有分类
+     *
+     * @param category 分类对象
+     */
+    void updateDetail(CategoryEntity category);
 }
 

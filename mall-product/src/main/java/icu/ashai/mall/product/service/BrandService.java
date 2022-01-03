@@ -15,6 +15,19 @@ import java.util.Map;
  */
 public interface BrandService extends IService<BrandEntity> {
 
+    /**
+     * 查询页面
+     *
+     * @param params 查询条件
+     * @return 查询结果
+     */
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 更新详细信息
+     *
+     * @param brand 品牌类
+     */
+    void updateDetail(BrandEntity brand);
 }
 
