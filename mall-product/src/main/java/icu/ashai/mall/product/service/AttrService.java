@@ -3,6 +3,7 @@ package icu.ashai.mall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import icu.ashai.common.utils.PageUtils;
 import icu.ashai.mall.product.entity.AttrEntity;
+import icu.ashai.mall.product.vo.AttrVo;
 
 import java.util.Map;
 
@@ -16,5 +17,12 @@ import java.util.Map;
 public interface AttrService extends IService<AttrEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 保存属性信息
+     *
+     * @param attr 属性vo
+     */
+    void saveAttrVo(AttrVo attr);
 }
 

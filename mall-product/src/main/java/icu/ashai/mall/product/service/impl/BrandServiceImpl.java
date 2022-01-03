@@ -12,10 +12,17 @@ import icu.ashai.mall.product.service.CategoryBrandRelationService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
 
+/**
+ * @Description 品牌管理实现类
+ * @Author Ashai
+ * @email ashai.cn@gmail.com
+ * @Date 下午 05:50 2022/1/3
+ */
 @Service("brandService")
 public class BrandServiceImpl extends ServiceImpl<BrandDao, BrandEntity> implements BrandService {
 
@@ -44,6 +51,7 @@ public class BrandServiceImpl extends ServiceImpl<BrandDao, BrandEntity> impleme
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateDetail(BrandEntity brand) {
         updateById(brand);
         if (StringUtils.isNotEmpty(brand.getName())) {

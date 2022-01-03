@@ -67,7 +67,7 @@ public class CategoryController {
     }
 
     /**
-     * 修改
+     * 修改排序
      */
     @RequestMapping("/update/sort")
     public R updateSort(@RequestBody List<CategoryEntity> category) {
@@ -75,6 +75,7 @@ public class CategoryController {
 
         return R.ok();
     }
+
     /**
      * 删除
      */

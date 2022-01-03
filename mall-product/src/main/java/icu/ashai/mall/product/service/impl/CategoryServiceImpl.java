@@ -12,6 +12,7 @@ import icu.ashai.mall.product.service.CategoryService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -19,9 +20,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * 分类service
- *
- * @author Ashai
+ * @Description 分类管理实现类
+ * @Author Ashai
+ * @email ashai.cn@gmail.com
+ * @Date 下午 05:50 2022/1/3
  */
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService {
@@ -61,6 +63,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateDetail(CategoryEntity category) {
         this.updateById(category);
         if (StringUtils.isNotEmpty(category.getName())) {

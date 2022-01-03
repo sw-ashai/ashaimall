@@ -36,10 +36,7 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
-        IPage<AttrGroupEntity> page = this.page(
-                new Query<AttrGroupEntity>().getPage(params),
-                new QueryWrapper<>()
-        );
+        IPage<AttrGroupEntity> page = this.page(new Query<AttrGroupEntity>().getPage(params), new QueryWrapper<>());
 
         return new PageUtils(page);
     }
@@ -50,22 +47,22 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         LambdaQueryWrapper<AttrGroupEntity> wrapper;
 
         if (catelogId.equals(0L)) {
+//            查询全部
             wrapper = new LambdaQueryWrapper<>();
         } else {
-            String key = (String) params.get("key");
+//            查询指定id数据
             wrapper = new LambdaQueryWrapper<AttrGroupEntity>().eq(AttrGroupEntity::getCatelogId, catelogId);
-            if (StringUtils.isNotEmpty(key)) {
-                wrapper.and(attrGroupEntityLambdaQueryWrapper -> {
-                    attrGroupEntityLambdaQueryWrapper.eq(AttrGroupEntity::getAttrGroupId, key).or().like(AttrGroupEntity::getAttrGroupName, key);
-                });
-            }
-
-
         }
-        IPage<AttrGroupEntity> page = this.page(
-                new Query<AttrGroupEntity>().getPage(params),
-                wrapper
-        );
+
+        String key = (String) params.get("key");
+//        添加搜索条件
+        if (StringUtils.isNotEmpty(key)) {
+            wrapper.and(attrGroupEntityLambdaQueryWrapper -> {
+                attrGroupEntityLambdaQueryWrapper.eq(AttrGroupEntity::getAttrGroupId, key).or().like(AttrGroupEntity::getAttrGroupName, key);
+            });
+        }
+
+        IPage<AttrGroupEntity> page = this.page(new Query<AttrGroupEntity>().getPage(params), wrapper);
         return new PageUtils(page);
     }
 
