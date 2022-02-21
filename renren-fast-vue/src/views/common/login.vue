@@ -3,7 +3,7 @@
     <div class="site-content__wrapper">
       <div class="site-content">
         <div class="brand-info">
-          <h2 class="brand-info__text">Ashai商城后台管理系统</h2>
+          <h2 class="brand-info__text">商城后台管理系统</h2>
           <p class="brand-info__intro">基于renren-fast-vue以及renren-fast的商城后台管理系统</p>
         </div>
         <div class="login-main">
