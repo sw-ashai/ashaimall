@@ -3,6 +3,7 @@ package icu.ashai.mall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import icu.ashai.common.utils.PageUtils;
 import icu.ashai.mall.product.entity.AttrEntity;
+import icu.ashai.mall.product.vo.AttrRespVo;
 import icu.ashai.mall.product.vo.AttrVo;
 
 import java.util.Map;
@@ -33,5 +34,20 @@ public interface AttrService extends IService<AttrEntity> {
      * @return pageUtils
      */
     PageUtils queryBaseAttrPage(Map<String, Object> params, Long catelogId);
+
+    /**
+     * 根据分类属性id获取详细信息
+     *
+     * @param attrId 分类属性id
+     * @return result
+     */
+    AttrRespVo getAttrInfo(Long attrId);
+
+    /**
+     * 修改规格参数
+     *
+     * @param attr 属性vo
+     */
+    void updateAttr(AttrVo attr);
 }
 

@@ -19,6 +19,7 @@ public interface CategoryService extends IService<CategoryEntity> {
 
     /**
      * 常规列表查询
+     *
      * @param params 查询参数
      * @return list
      */
@@ -26,6 +27,7 @@ public interface CategoryService extends IService<CategoryEntity> {
 
     /**
      * 三级分类获取
+     *
      * @return list
      */
     List<CategoryEntity> listWithTree();
@@ -43,5 +45,13 @@ public interface CategoryService extends IService<CategoryEntity> {
      * @param category 分类对象
      */
     void updateDetail(CategoryEntity category);
+
+    /**
+     * 获取分类的完成路径
+     *
+     * @param catelogId 分类id
+     * @return 完整路径
+     */
+    Long[] findCatelogPath(Long catelogId);
 }
 

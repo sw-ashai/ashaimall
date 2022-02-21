@@ -2,8 +2,8 @@ package icu.ashai.mall.product.controller;
 
 import icu.ashai.common.utils.PageUtils;
 import icu.ashai.common.utils.R;
-import icu.ashai.mall.product.entity.AttrEntity;
 import icu.ashai.mall.product.service.AttrService;
+import icu.ashai.mall.product.vo.AttrRespVo;
 import icu.ashai.mall.product.vo.AttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -53,9 +53,8 @@ public class AttrController {
      */
     @RequestMapping("/info/{attrId}")
     public R info(@PathVariable("attrId") Long attrId) {
-        AttrEntity attr = attrService.getById(attrId);
-
-        return R.ok().put("attr", attr);
+        AttrRespVo respVo = attrService.getAttrInfo(attrId);
+        return R.ok().put("attr", respVo);
     }
 
     /**
@@ -72,8 +71,8 @@ public class AttrController {
      * 修改
      */
     @RequestMapping("/update")
-    public R update(@RequestBody AttrEntity attr) {
-        attrService.updateById(attr);
+    public R update(@RequestBody AttrVo attr) {
+        attrService.updateAttr(attr);
 
         return R.ok();
     }

@@ -14,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -49,7 +47,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     public List<CategoryEntity> listWithTree() {
         List<CategoryEntity> categoryEntities = baseMapper.selectList(null);
 
-
         return categoryEntities.stream()
                 .filter(categoryEntity -> categoryEntity.getParentCid() == 0)
                 .peek(categoryEntity -> categoryEntity.setChildren(getChildren(categoryEntity, categoryEntities)))
@@ -68,6 +65,36 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         this.updateById(category);
         if (StringUtils.isNotEmpty(category.getName())) {
             categoryBrandRelationService.updateCategory(category.getCatId(), category.getName());
+        }
+    }
+
+    /**
+     * 获取完整分类路径
+     *
+     * @param catelogId 分类id
+     * @return 分类路径
+     */
+    @Override
+    public Long[] findCatelogPath(Long catelogId) {
+        ArrayList<Long> path = new ArrayList<>();
+        findParentPath(catelogId, path);
+        Collections.reverse(path);
+        return path.toArray(new Long[0]);
+    }
+
+    /**
+     * 寻找父路径并添加
+     *
+     * @param catelogId 分类id
+     * @param path      完整路径集合
+     */
+    private void findParentPath(Long catelogId, ArrayList<Long> path) {
+        path.add(catelogId);
+        CategoryEntity byId = this.getById(catelogId);
+        if (byId != null) {
+            if (byId.getParentCid() != 0) {
+                findParentPath(byId.getParentCid(), path);
+            }
         }
     }
 

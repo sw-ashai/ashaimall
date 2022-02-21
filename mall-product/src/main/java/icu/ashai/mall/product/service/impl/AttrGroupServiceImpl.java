@@ -15,8 +15,6 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -68,29 +66,24 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
     @Override
     public AttrGroupEntity getInfo(Long attrGroupId) {
-
-        List<Long> paths = new LinkedList<>();
-
         AttrGroupEntity attrGroup = getById(attrGroupId);
-
         CategoryEntity category = categoryService.getById(attrGroup.getCatelogId());
 
-        paths = getCategoryPath(category, paths);
-        Collections.reverse(paths);
+        Long[] path = categoryService.findCatelogPath(category.getCatId());
 
-        attrGroup.setCatelogPath(paths.toArray(new Long[0]));
+        attrGroup.setCatelogPath(path);
 
         return attrGroup;
     }
 
     /**
-     * 获取分类路径
+     * 获取分类路径  自己写的，用分类service下的findCatelogPath方法
      *
      * @param category 分类对象
      * @param paths    路径集合
      * @return 查询结果
      */
-
+    @Deprecated
     private List<Long> getCategoryPath(CategoryEntity category, List<Long> paths) {
 
         paths.add(category.getCatId());
@@ -101,6 +94,5 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
         return getCategoryPath(categoryService.getById(category.getParentCid()), paths);
     }
-
 
 }

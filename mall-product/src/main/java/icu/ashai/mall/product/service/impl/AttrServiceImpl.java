@@ -2,6 +2,7 @@ package icu.ashai.mall.product.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import icu.ashai.common.utils.PageUtils;
@@ -15,6 +16,7 @@ import icu.ashai.mall.product.entity.AttrEntity;
 import icu.ashai.mall.product.entity.AttrGroupEntity;
 import icu.ashai.mall.product.entity.CategoryEntity;
 import icu.ashai.mall.product.service.AttrService;
+import icu.ashai.mall.product.service.CategoryService;
 import icu.ashai.mall.product.vo.AttrRespVo;
 import icu.ashai.mall.product.vo.AttrVo;
 import org.apache.commons.lang.StringUtils;
@@ -49,12 +51,17 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
      * 分类dao
      */
     private final CategoryDao categoryDao;
+    /**
+     * 分类service
+     */
+    private final CategoryService categoryService;
 
     @Autowired
-    public AttrServiceImpl(AttrAttrgroupRelationDao attrAttrgroupRelationDao, AttrGroupDao attrGroupDao, CategoryDao categoryDao) {
+    public AttrServiceImpl(AttrAttrgroupRelationDao attrAttrgroupRelationDao, AttrGroupDao attrGroupDao, CategoryDao categoryDao, CategoryService categoryService) {
         this.attrAttrgroupRelationDao = attrAttrgroupRelationDao;
         this.attrGroupDao = attrGroupDao;
         this.categoryDao = categoryDao;
+        this.categoryService = categoryService;
     }
 
     @Override
@@ -127,6 +134,57 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         pageUtils.setList(respVos);
 
         return pageUtils;
+    }
+
+    @Override
+    public AttrRespVo getAttrInfo(Long attrId) {
+        AttrRespVo respVo = new AttrRespVo();
+        AttrEntity attrEntity = this.getById(attrId);
+        BeanUtils.copyProperties(attrEntity, respVo);
+
+//        设置分组信息
+        AttrAttrgroupRelationEntity attrAttrgroupRelation = attrAttrgroupRelationDao.selectOne(new LambdaQueryWrapper<AttrAttrgroupRelationEntity>().eq(AttrAttrgroupRelationEntity::getAttrId, attrEntity.getAttrId()));
+        if (attrAttrgroupRelation != null) {
+            respVo.setAttrGroupId(attrAttrgroupRelation.getAttrGroupId());
+            AttrGroupEntity attrGroupEntity = attrGroupDao.selectById(attrAttrgroupRelation.getAttrGroupId());
+            if (attrGroupEntity != null) {
+                respVo.setGroupName(attrGroupEntity.getAttrGroupName());
+            }
+        }
+//        设置分类信息
+        Long catelogId = attrEntity.getCatelogId();
+        respVo.setCatelogPath(categoryService.findCatelogPath(catelogId));
+
+        CategoryEntity categoryEntity = categoryDao.selectById(catelogId);
+        if (categoryEntity != null) {
+            respVo.setCatelogName(categoryEntity.getName());
+        }
+        return respVo;
+    }
+
+    /**
+     * 修改分组属性
+     *
+     * @param attr 属性vo
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateAttr(AttrVo attr) {
+        AttrEntity attrEntity = new AttrEntity();
+        BeanUtils.copyProperties(attr, attrEntity);
+        this.updateById(attrEntity);
+
+//        修改分组属性
+        AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = new AttrAttrgroupRelationEntity();
+        attrAttrgroupRelationEntity.setAttrId(attr.getAttrId());
+        attrAttrgroupRelationEntity.setAttrGroupId(attr.getAttrGroupId());
+
+        Integer count = attrAttrgroupRelationDao.selectCount(new LambdaQueryWrapper<AttrAttrgroupRelationEntity>().eq(AttrAttrgroupRelationEntity::getAttrId, attr.getAttrId()));
+        if (count > 0) {
+            attrAttrgroupRelationDao.update(attrAttrgroupRelationEntity, new LambdaUpdateWrapper<AttrAttrgroupRelationEntity>().eq(AttrAttrgroupRelationEntity::getAttrId, attr.getAttrId()));
+        } else {
+            attrAttrgroupRelationDao.insert(attrAttrgroupRelationEntity);
+        }
     }
 
 }
