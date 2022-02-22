@@ -3,9 +3,11 @@ package icu.ashai.mall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import icu.ashai.common.utils.PageUtils;
 import icu.ashai.mall.product.entity.AttrEntity;
+import icu.ashai.mall.product.vo.AttrGroupRelationVo;
 import icu.ashai.mall.product.vo.AttrRespVo;
 import icu.ashai.mall.product.vo.AttrVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,5 +52,29 @@ public interface AttrService extends IService<AttrEntity> {
      * @param attr 属性vo
      */
     void updateAttr(AttrVo attr);
+
+    /**
+     * 获取属性分组的所有属性
+     *
+     * @param attrgroupId 属性分组id
+     * @return 查询结果
+     */
+    List<AttrEntity> getRelationAttr(Long attrgroupId);
+
+    /**
+     * 删除绑定关系
+     *
+     * @param attrGroupRelationVoList 需要删除的绑定关系
+     */
+    void deleteRelation(List<AttrGroupRelationVo> attrGroupRelationVoList);
+
+    /**
+     * 获取所有可关联的属性
+     *
+     * @param params      模糊查询参数
+     * @param attrgroupId 分组属性id
+     * @return 分页模型
+     */
+    PageUtils getNoRelation(Map<String, Object> params, Long attrgroupId);
 }
 

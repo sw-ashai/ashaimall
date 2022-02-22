@@ -22,8 +22,13 @@ import java.util.Map;
 @RestController
 @RequestMapping("product/attr")
 public class AttrController {
+
+    private final AttrService attrService;
+
     @Autowired
-    private AttrService attrService;
+    public AttrController(AttrService attrService) {
+        this.attrService = attrService;
+    }
 
 
     /**
