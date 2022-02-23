@@ -1,18 +1,19 @@
 <template>
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+      <el-form-item label="仓库">
+        <el-select style="width:160px;" v-model="dataForm.wareId" placeholder="请选择仓库" clearable>
+          <el-option :label="w.name" :value="w.id" v-for="w in wareList" :key="w.id"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="skuId">
+        <el-input v-model="dataForm.skuId" placeholder="skuId" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
+        <el-button v-if="isAuth('ware:waresku:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button
-          v-if="isAuth('coupon:memberprice:save')"
-          type="primary"
-          @click="addOrUpdateHandle()"
-        >新增</el-button>
-        <el-button
-          v-if="isAuth('coupon:memberprice:delete')"
+          v-if="isAuth('ware:waresku:delete')"
           type="danger"
           @click="deleteHandle()"
           :disabled="dataListSelections.length <= 0"
@@ -29,20 +30,10 @@
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
       <el-table-column prop="id" header-align="center" align="center" label="id"></el-table-column>
       <el-table-column prop="skuId" header-align="center" align="center" label="sku_id"></el-table-column>
-      <el-table-column prop="memberLevelId" header-align="center" align="center" label="会员等级id"></el-table-column>
-      <el-table-column prop="memberLevelName" header-align="center" align="center" label="会员等级名"></el-table-column>
-      <el-table-column prop="memberPrice" header-align="center" align="center" label="会员对应价格"></el-table-column>
-      <el-table-column
-        prop="addOther"
-        header-align="center"
-        align="center"
-        label="可否叠加其他优惠"
-      >
-        <template slot-scope="scope">
-          <el-tag type="primary" v-if="scope.row.addOther==0">不可叠加优惠</el-tag>
-          <el-tag type="success" v-else>可叠加优惠</el-tag>
-        </template>
-      </el-table-column>
+      <el-table-column prop="wareId" header-align="center" align="center" label="仓库id"></el-table-column>
+      <el-table-column prop="stock" header-align="center" align="center" label="库存数"></el-table-column>
+      <el-table-column prop="skuName" header-align="center" align="center" label="sku_name"></el-table-column>
+      <el-table-column prop="stockLocked" header-align="center" align="center" label="锁定库存"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
@@ -65,12 +56,14 @@
 </template>
 
 <script>
-import AddOrUpdate from "./memberprice-add-or-update";
+import AddOrUpdate from "./waresku-add-or-update";
 export default {
   data() {
     return {
+      wareList: [],
       dataForm: {
-        key: ""
+        wareId: "",
+        skuId: ""
       },
       dataList: [],
       pageIndex: 1,
@@ -85,19 +78,37 @@ export default {
     AddOrUpdate
   },
   activated() {
+    console.log("接收到", this.$route.query.skuId);
+    if (this.$route.query.skuId) {
+      this.dataForm.skuId = this.$route.query.skuId;
+    }
+    this.getWares();
     this.getDataList();
   },
   methods: {
+    getWares() {
+      this.$http({
+        url: this.$http.adornUrl("/ware/wareinfo/list"),
+        method: "get",
+        params: this.$http.adornParams({
+          page: 1,
+          limit: 500
+        })
+      }).then(({ data }) => {
+        this.wareList = data.page.list;
+      });
+    },
     // 获取数据列表
     getDataList() {
       this.dataListLoading = true;
       this.$http({
-        url: this.$http.adornUrl("/coupon/memberprice/list"),
+        url: this.$http.adornUrl("/ware/waresku/list"),
         method: "get",
         params: this.$http.adornParams({
           page: this.pageIndex,
           limit: this.pageSize,
-          key: this.dataForm.key
+          skuId: this.dataForm.skuId,
+          wareId: this.dataForm.wareId
         })
       }).then(({ data }) => {
         if (data && data.code === 0) {
@@ -149,7 +160,7 @@ export default {
         }
       ).then(() => {
         this.$http({
-          url: this.$http.adornUrl("/coupon/memberprice/delete"),
+          url: this.$http.adornUrl("/ware/waresku/delete"),
           method: "post",
           data: this.$http.adornData(ids, false)
         }).then(({ data }) => {

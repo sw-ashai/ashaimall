@@ -6,8 +6,8 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('coupon:skuladder:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('coupon:skuladder:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('order:orderreturnapply:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('order:orderreturnapply:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -29,34 +29,166 @@
         label="id">
       </el-table-column>
       <el-table-column
+        prop="orderId"
+        header-align="center"
+        align="center"
+        label="order_id">
+      </el-table-column>
+      <el-table-column
         prop="skuId"
         header-align="center"
         align="center"
-        label="spu_id">
+        label="退货商品id">
       </el-table-column>
       <el-table-column
-        prop="fullCount"
+        prop="orderSn"
         header-align="center"
         align="center"
-        label="满几件">
+        label="订单编号">
       </el-table-column>
       <el-table-column
-        prop="discount"
+        prop="createTime"
         header-align="center"
         align="center"
-        label="打几折">
+        label="申请时间">
       </el-table-column>
       <el-table-column
-        prop="price"
+        prop="memberUsername"
         header-align="center"
         align="center"
-        label="折后价">
+        label="会员用户名">
       </el-table-column>
       <el-table-column
-        prop="addOther"
+        prop="returnAmount"
         header-align="center"
         align="center"
-        label="是否叠加优惠">
+        label="退款金额">
+      </el-table-column>
+      <el-table-column
+        prop="returnName"
+        header-align="center"
+        align="center"
+        label="退货人姓名">
+      </el-table-column>
+      <el-table-column
+        prop="returnPhone"
+        header-align="center"
+        align="center"
+        label="退货人电话">
+      </el-table-column>
+      <el-table-column
+        prop="status"
+        header-align="center"
+        align="center"
+        label="申请状态[0->待处理；1->退货中；2->已完成；3->已拒绝]">
+      </el-table-column>
+      <el-table-column
+        prop="handleTime"
+        header-align="center"
+        align="center"
+        label="处理时间">
+      </el-table-column>
+      <el-table-column
+        prop="skuImg"
+        header-align="center"
+        align="center"
+        label="商品图片">
+      </el-table-column>
+      <el-table-column
+        prop="skuName"
+        header-align="center"
+        align="center"
+        label="商品名称">
+      </el-table-column>
+      <el-table-column
+        prop="skuBrand"
+        header-align="center"
+        align="center"
+        label="商品品牌">
+      </el-table-column>
+      <el-table-column
+        prop="skuAttrsVals"
+        header-align="center"
+        align="center"
+        label="商品销售属性(JSON)">
+      </el-table-column>
+      <el-table-column
+        prop="skuCount"
+        header-align="center"
+        align="center"
+        label="退货数量">
+      </el-table-column>
+      <el-table-column
+        prop="skuPrice"
+        header-align="center"
+        align="center"
+        label="商品单价">
+      </el-table-column>
+      <el-table-column
+        prop="skuRealPrice"
+        header-align="center"
+        align="center"
+        label="商品实际支付单价">
+      </el-table-column>
+      <el-table-column
+        prop="reason"
+        header-align="center"
+        align="center"
+        label="原因">
+      </el-table-column>
+      <el-table-column
+        prop="description述"
+        header-align="center"
+        align="center"
+        label="描述">
+      </el-table-column>
+      <el-table-column
+        prop="descPics"
+        header-align="center"
+        align="center"
+        label="凭证图片，以逗号隔开">
+      </el-table-column>
+      <el-table-column
+        prop="handleNote"
+        header-align="center"
+        align="center"
+        label="处理备注">
+      </el-table-column>
+      <el-table-column
+        prop="handleMan"
+        header-align="center"
+        align="center"
+        label="处理人员">
+      </el-table-column>
+      <el-table-column
+        prop="receiveMan"
+        header-align="center"
+        align="center"
+        label="收货人">
+      </el-table-column>
+      <el-table-column
+        prop="receiveTime"
+        header-align="center"
+        align="center"
+        label="收货时间">
+      </el-table-column>
+      <el-table-column
+        prop="receiveNote"
+        header-align="center"
+        align="center"
+        label="收货备注">
+      </el-table-column>
+      <el-table-column
+        prop="receivePhone"
+        header-align="center"
+        align="center"
+        label="收货电话">
+      </el-table-column>
+      <el-table-column
+        prop="companyAddress"
+        header-align="center"
+        align="center"
+        label="公司收货地址">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -85,7 +217,7 @@
 </template>
 
 <script>
-  import AddOrUpdate from './skuladder-add-or-update'
+  import AddOrUpdate from './orderreturnapply-add-or-update'
   export default {
     data () {
       return {
@@ -112,7 +244,7 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/coupon/skuladder/list'),
+          url: this.$http.adornUrl('/order/orderreturnapply/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -163,7 +295,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/coupon/skuladder/delete'),
+            url: this.$http.adornUrl('/order/orderreturnapply/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {

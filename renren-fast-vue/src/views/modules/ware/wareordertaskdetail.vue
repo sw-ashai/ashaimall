@@ -53,18 +53,6 @@
         label="工作单id">
       </el-table-column>
       <el-table-column
-        prop="wareId"
-        header-align="center"
-        align="center"
-        label="仓库id">
-      </el-table-column>
-      <el-table-column
-        prop="lockStatus"
-        header-align="center"
-        align="center"
-        label="1-已锁定  2-已解锁  3-扣减">
-      </el-table-column>
-      <el-table-column
         fixed="right"
         header-align="center"
         align="center"

@@ -3,7 +3,7 @@
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="120px">
     <el-form-item label="秒杀订单超时关闭时间(分)" prop="flashOrderOvertime">
       <el-input v-model="dataForm.flashOrderOvertime" placeholder="秒杀订单超时关闭时间(分)"></el-input>
     </el-form-item>

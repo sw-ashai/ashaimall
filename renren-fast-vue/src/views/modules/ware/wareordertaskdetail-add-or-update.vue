@@ -3,7 +3,7 @@
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="120px">
     <el-form-item label="sku_id" prop="skuId">
       <el-input v-model="dataForm.skuId" placeholder="sku_id"></el-input>
     </el-form-item>
@@ -15,12 +15,6 @@
     </el-form-item>
     <el-form-item label="工作单id" prop="taskId">
       <el-input v-model="dataForm.taskId" placeholder="工作单id"></el-input>
-    </el-form-item>
-    <el-form-item label="仓库id" prop="wareId">
-      <el-input v-model="dataForm.wareId" placeholder="仓库id"></el-input>
-    </el-form-item>
-    <el-form-item label="1-已锁定  2-已解锁  3-扣减" prop="lockStatus">
-      <el-input v-model="dataForm.lockStatus" placeholder="1-已锁定  2-已解锁  3-扣减"></el-input>
     </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -40,9 +34,7 @@
           skuId: '',
           skuName: '',
           skuNum: '',
-          taskId: '',
-          wareId: '',
-          lockStatus: ''
+          taskId: ''
         },
         dataRule: {
           skuId: [
@@ -56,12 +48,6 @@
           ],
           taskId: [
             { required: true, message: '工作单id不能为空', trigger: 'blur' }
-          ],
-          wareId: [
-            { required: true, message: '仓库id不能为空', trigger: 'blur' }
-          ],
-          lockStatus: [
-            { required: true, message: '1-已锁定  2-已解锁  3-扣减不能为空', trigger: 'blur' }
           ]
         }
       }
@@ -83,8 +69,6 @@
                 this.dataForm.skuName = data.wareOrderTaskDetail.skuName
                 this.dataForm.skuNum = data.wareOrderTaskDetail.skuNum
                 this.dataForm.taskId = data.wareOrderTaskDetail.taskId
-                this.dataForm.wareId = data.wareOrderTaskDetail.wareId
-                this.dataForm.lockStatus = data.wareOrderTaskDetail.lockStatus
               }
             })
           }
@@ -102,9 +86,7 @@
                 'skuId': this.dataForm.skuId,
                 'skuName': this.dataForm.skuName,
                 'skuNum': this.dataForm.skuNum,
-                'taskId': this.dataForm.taskId,
-                'wareId': this.dataForm.wareId,
-                'lockStatus': this.dataForm.lockStatus
+                'taskId': this.dataForm.taskId
               })
             }).then(({data}) => {
               if (data && data.code === 0) {

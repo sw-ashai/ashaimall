@@ -6,17 +6,6 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button
-          v-if="isAuth('coupon:memberprice:save')"
-          type="primary"
-          @click="addOrUpdateHandle()"
-        >新增</el-button>
-        <el-button
-          v-if="isAuth('coupon:memberprice:delete')"
-          type="danger"
-          @click="deleteHandle()"
-          :disabled="dataListSelections.length <= 0"
-        >批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -28,27 +17,31 @@
     >
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
       <el-table-column prop="id" header-align="center" align="center" label="id"></el-table-column>
-      <el-table-column prop="skuId" header-align="center" align="center" label="sku_id"></el-table-column>
-      <el-table-column prop="memberLevelId" header-align="center" align="center" label="会员等级id"></el-table-column>
-      <el-table-column prop="memberLevelName" header-align="center" align="center" label="会员等级名"></el-table-column>
-      <el-table-column prop="memberPrice" header-align="center" align="center" label="会员对应价格"></el-table-column>
+      <el-table-column prop="couponId" header-align="center" align="center" label="优惠券id"></el-table-column>
+      <el-table-column prop="memberId" header-align="center" align="center" label="会员id"></el-table-column>
+      <el-table-column prop="memberNickName" header-align="center" align="center" label="会员名字"></el-table-column>
+      <el-table-column prop="getType" header-align="center" align="center" label="获取方式">
+        <template slot-scope="scope">
+          <el-tag type="primary" v-if="scope.row.getType==0">后台赠送</el-tag>
+          <el-tag type="success" v-else>主动领取</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="createTime" header-align="center" align="center" label="创建时间"></el-table-column>
       <el-table-column
-        prop="addOther"
+        prop="useType"
         header-align="center"
         align="center"
-        label="可否叠加其他优惠"
+        label="使用状态"
       >
         <template slot-scope="scope">
-          <el-tag type="primary" v-if="scope.row.addOther==0">不可叠加优惠</el-tag>
-          <el-tag type="success" v-else>可叠加优惠</el-tag>
+          <el-tag type="primary" v-if="scope.row.useType==0">未使用</el-tag>
+          <el-tag type="success" v-if="scope.row.useType==1">已使用</el-tag>
+          <el-tag type="warning" v-if="scope.row.useType==2">已过期</el-tag>
         </template>
       </el-table-column>
-      <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
-        <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-        </template>
-      </el-table-column>
+      <el-table-column prop="useTime" header-align="center" align="center" label="使用时间"></el-table-column>
+      <el-table-column prop="orderId" header-align="center" align="center" label="订单id"></el-table-column>
+      <el-table-column prop="orderSn" header-align="center" align="center" label="订单号"></el-table-column>
     </el-table>
     <el-pagination
       @size-change="sizeChangeHandle"
@@ -60,12 +53,10 @@
       layout="total, sizes, prev, pager, next, jumper"
     ></el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
   </div>
 </template>
 
 <script>
-import AddOrUpdate from "./memberprice-add-or-update";
 export default {
   data() {
     return {
@@ -82,7 +73,6 @@ export default {
     };
   },
   components: {
-    AddOrUpdate
   },
   activated() {
     this.getDataList();
@@ -92,7 +82,7 @@ export default {
     getDataList() {
       this.dataListLoading = true;
       this.$http({
-        url: this.$http.adornUrl("/coupon/memberprice/list"),
+        url: this.$http.adornUrl("/coupon/couponhistory/list"),
         method: "get",
         params: this.$http.adornParams({
           page: this.pageIndex,
@@ -149,7 +139,7 @@ export default {
         }
       ).then(() => {
         this.$http({
-          url: this.$http.adornUrl("/coupon/memberprice/delete"),
+          url: this.$http.adornUrl("/coupon/couponhistory/delete"),
           method: "post",
           data: this.$http.adornData(ids, false)
         }).then(({ data }) => {

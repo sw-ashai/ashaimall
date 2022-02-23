@@ -3,30 +3,30 @@
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="120px">
     <el-form-item label="等级名称" prop="name">
       <el-input v-model="dataForm.name" placeholder="等级名称"></el-input>
     </el-form-item>
-    <el-form-item label="等级需要的成长值" prop="growthPoint">
-      <el-input v-model="dataForm.growthPoint" placeholder="等级需要的成长值"></el-input>
+    <el-form-item label="所需成长值" prop="growthPoint">
+      <el-input-number v-model="dataForm.growthPoint" :min="0"></el-input-number>
     </el-form-item>
-    <el-form-item label="是否为默认等级[0->不是；1->是]" prop="defaultStatus">
-      <el-input v-model="dataForm.defaultStatus" placeholder="是否为默认等级[0->不是；1->是]"></el-input>
+    <el-form-item label="默认等级" prop="defaultStatus">
+      <el-checkbox v-model="dataForm.defaultStatus" :true-label="1" :false-label="0"></el-checkbox>
     </el-form-item>
     <el-form-item label="免运费标准" prop="freeFreightPoint">
-      <el-input v-model="dataForm.freeFreightPoint" placeholder="免运费标准"></el-input>
+      <el-input-number :min="0" v-model="dataForm.freeFreightPoint"></el-input-number>
     </el-form-item>
     <el-form-item label="每次评价获取的成长值" prop="commentGrowthPoint">
-      <el-input v-model="dataForm.commentGrowthPoint" placeholder="每次评价获取的成长值"></el-input>
+      <el-input-number :min="0" v-model="dataForm.commentGrowthPoint"></el-input-number>
     </el-form-item>
     <el-form-item label="是否有免邮特权" prop="priviledgeFreeFreight">
-      <el-input v-model="dataForm.priviledgeFreeFreight" placeholder="是否有免邮特权"></el-input>
+      <el-checkbox v-model="dataForm.priviledgeFreeFreight" :true-label="1" :false-label="0"></el-checkbox>
     </el-form-item>
     <el-form-item label="是否有会员价格特权" prop="priviledgeMemberPrice">
-      <el-input v-model="dataForm.priviledgeMemberPrice" placeholder="是否有会员价格特权"></el-input>
+       <el-checkbox v-model="dataForm.priviledgeMemberPrice" :true-label="1" :false-label="0"></el-checkbox>
     </el-form-item>
     <el-form-item label="是否有生日特权" prop="priviledgeBirthday">
-      <el-input v-model="dataForm.priviledgeBirthday" placeholder="是否有生日特权"></el-input>
+      <el-checkbox v-model="dataForm.priviledgeBirthday" :true-label="1" :false-label="0"></el-checkbox>
     </el-form-item>
     <el-form-item label="备注" prop="note">
       <el-input v-model="dataForm.note" placeholder="备注"></el-input>
@@ -47,14 +47,14 @@
         dataForm: {
           id: 0,
           name: '',
-          growthPoint: '',
-          defaultStatus: '',
-          freeFreightPoint: '',
-          commentGrowthPoint: '',
-          priviledgeFreeFreight: '',
-          priviledgeMemberPrice: '',
-          priviledgeBirthday: '',
-          note: ''
+          growthPoint: 0,
+          defaultStatus: 0,
+          freeFreightPoint: 0,
+          commentGrowthPoint: 0,
+          priviledgeFreeFreight: 0,
+          priviledgeMemberPrice: 0,
+          priviledgeBirthday: 0,
+          note: ""
         },
         dataRule: {
           name: [
@@ -101,13 +101,13 @@
             }).then(({data}) => {
               if (data && data.code === 0) {
                 this.dataForm.name = data.memberLevel.name
-                this.dataForm.growthPoint = data.memberLevel.growthPoint
-                this.dataForm.defaultStatus = data.memberLevel.defaultStatus
-                this.dataForm.freeFreightPoint = data.memberLevel.freeFreightPoint
-                this.dataForm.commentGrowthPoint = data.memberLevel.commentGrowthPoint
-                this.dataForm.priviledgeFreeFreight = data.memberLevel.priviledgeFreeFreight
-                this.dataForm.priviledgeMemberPrice = data.memberLevel.priviledgeMemberPrice
-                this.dataForm.priviledgeBirthday = data.memberLevel.priviledgeBirthday
+                this.dataForm.growthPoint = data.memberLevel.growthPoint||0
+                this.dataForm.defaultStatus = data.memberLevel.defaultStatus||0
+                this.dataForm.freeFreightPoint = data.memberLevel.freeFreightPoint||0
+                this.dataForm.commentGrowthPoint = data.memberLevel.commentGrowthPoint||0
+                this.dataForm.priviledgeFreeFreight = data.memberLevel.priviledgeFreeFreight||0
+                this.dataForm.priviledgeMemberPrice = data.memberLevel.priviledgeMemberPrice||0
+                this.dataForm.priviledgeBirthday = data.memberLevel.priviledgeBirthday||0
                 this.dataForm.note = data.memberLevel.note
               }
             })

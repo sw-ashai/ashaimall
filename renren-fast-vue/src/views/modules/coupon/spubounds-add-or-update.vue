@@ -3,8 +3,8 @@
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-    <el-form-item label="" prop="spuId">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="120px">
+    <el-form-item label="spuId" prop="spuId">
       <el-input v-model="dataForm.spuId" placeholder=""></el-input>
     </el-form-item>
     <el-form-item label="成长积分" prop="growBounds">
@@ -13,8 +13,9 @@
     <el-form-item label="购物积分" prop="buyBounds">
       <el-input v-model="dataForm.buyBounds" placeholder="购物积分"></el-input>
     </el-form-item>
-    <el-form-item label="优惠生效情况[1111（四个状态位，从右到左）;0 - 无优惠，成长积分是否赠送;1 - 无优惠，购物积分是否赠送;2 - 有优惠，成长积分是否赠送;3 - 有优惠，购物积分是否赠送【状态位0：不赠送，1：赠送】]" prop="work">
-      <el-input v-model="dataForm.work" placeholder="优惠生效情况[1111（四个状态位，从右到左）;0 - 无优惠，成长积分是否赠送;1 - 无优惠，购物积分是否赠送;2 - 有优惠，成长积分是否赠送;3 - 有优惠，购物积分是否赠送【状态位0：不赠送，1：赠送】]"></el-input>
+    <!-- [1111（四个状态位，从右到左）;0 - 无优惠，成长积分是否赠送;1 - 无优惠，购物积分是否赠送;2 - 有优惠，成长积分是否赠送;3 - 有优惠，购物积分是否赠送【状态位0：不赠送，1：赠送】] -->
+    <el-form-item label="优惠生效情况" prop="work">
+      <el-input v-model="dataForm.work" placeholder="优惠生效情况"></el-input>
     </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
