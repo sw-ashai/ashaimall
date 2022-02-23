@@ -2,8 +2,10 @@ package icu.ashai.mall.product.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import icu.ashai.common.utils.PageUtils;
+import icu.ashai.mall.product.entity.BrandEntity;
 import icu.ashai.mall.product.entity.CategoryBrandRelationEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,5 +47,13 @@ public interface CategoryBrandRelationService extends IService<CategoryBrandRela
      * @param name  分类名称
      */
     void updateCategory(Long catId, String name);
+
+    /**
+     * 根据分类id查询所有对应的品牌
+     *
+     * @param catId 分类id
+     * @return 查询结果
+     */
+    List<BrandEntity> getBrandsByCatId(Long catId);
 }
 

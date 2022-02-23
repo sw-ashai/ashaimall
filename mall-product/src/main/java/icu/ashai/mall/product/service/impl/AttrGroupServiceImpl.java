@@ -7,16 +7,21 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import icu.ashai.common.utils.PageUtils;
 import icu.ashai.common.utils.Query;
 import icu.ashai.mall.product.dao.AttrGroupDao;
+import icu.ashai.mall.product.entity.AttrEntity;
 import icu.ashai.mall.product.entity.AttrGroupEntity;
 import icu.ashai.mall.product.entity.CategoryEntity;
 import icu.ashai.mall.product.service.AttrGroupService;
+import icu.ashai.mall.product.service.AttrService;
 import icu.ashai.mall.product.service.CategoryService;
+import icu.ashai.mall.product.vo.AttrGroupWithAttrsVo;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Service("attrGroupService")
@@ -27,9 +32,15 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
      */
     private final CategoryService categoryService;
 
+    /**
+     * 属性service
+     */
+    private final AttrService attrService;
+
     @Autowired
-    public AttrGroupServiceImpl(CategoryService categoryService) {
+    public AttrGroupServiceImpl(CategoryService categoryService, AttrService attrService) {
         this.categoryService = categoryService;
+        this.attrService = attrService;
     }
 
     @Override
@@ -74,6 +85,19 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         attrGroup.setCatelogPath(path);
 
         return attrGroup;
+    }
+
+    @Override
+    public List<AttrGroupWithAttrsVo> getAttrGroupWithAttrsByCatelogId(Long catelogId) {
+        List<AttrGroupEntity> attrGroupList = this.list(new LambdaQueryWrapper<AttrGroupEntity>().eq(AttrGroupEntity::getCatelogId, catelogId));
+
+        return attrGroupList.stream().map(item -> {
+            AttrGroupWithAttrsVo attrGroupWithAttrsVo = new AttrGroupWithAttrsVo();
+            BeanUtils.copyProperties(item, attrGroupWithAttrsVo);
+            List<AttrEntity> attrEntities = attrService.getRelationAttr(item.getAttrGroupId());
+            attrGroupWithAttrsVo.setAttrs(attrEntities);
+            return attrGroupWithAttrsVo;
+        }).collect(Collectors.toList());
     }
 
     /**

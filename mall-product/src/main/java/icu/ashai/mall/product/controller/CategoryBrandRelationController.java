@@ -3,14 +3,17 @@ package icu.ashai.mall.product.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import icu.ashai.common.utils.PageUtils;
 import icu.ashai.common.utils.R;
+import icu.ashai.mall.product.entity.BrandEntity;
 import icu.ashai.mall.product.entity.CategoryBrandRelationEntity;
 import icu.ashai.mall.product.service.CategoryBrandRelationService;
+import icu.ashai.mall.product.vo.BrandVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -23,8 +26,13 @@ import java.util.Map;
 @RestController
 @RequestMapping("product/categorybrandrelation")
 public class CategoryBrandRelationController {
+
+    private final CategoryBrandRelationService categoryBrandRelationService;
+
     @Autowired
-    private CategoryBrandRelationService categoryBrandRelationService;
+    public CategoryBrandRelationController(CategoryBrandRelationService categoryBrandRelationService) {
+        this.categoryBrandRelationService = categoryBrandRelationService;
+    }
 
     /**
      * 列表
@@ -34,6 +42,19 @@ public class CategoryBrandRelationController {
         PageUtils page = categoryBrandRelationService.queryPage(params);
 
         return R.ok().put("page", page);
+    }
+
+    @GetMapping("/brands/list")
+    public R relationBrandsList(Long catId) {
+        List<BrandEntity> brandEntities = categoryBrandRelationService.getBrandsByCatId(catId);
+        List<BrandVo> vos = brandEntities.stream().map(item -> {
+            BrandVo brandVo = new BrandVo();
+            brandVo.setBrandId(item.getBrandId());
+            brandVo.setBrandName(item.getName());
+            return brandVo;
+        }).collect(Collectors.toList());
+
+        return R.ok().put("data", vos);
     }
 
     /**

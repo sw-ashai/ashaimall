@@ -8,6 +8,7 @@ import icu.ashai.mall.product.service.AttrAttrgroupRelationService;
 import icu.ashai.mall.product.service.AttrGroupService;
 import icu.ashai.mall.product.service.AttrService;
 import icu.ashai.mall.product.vo.AttrGroupRelationVo;
+import icu.ashai.mall.product.vo.AttrGroupWithAttrsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -86,6 +87,14 @@ public class AttrGroupController {
     public R deleteRelation(@RequestBody List<AttrGroupRelationVo> attrGroupRelationVoList) {
         attrService.deleteRelation(attrGroupRelationVoList);
         return R.ok();
+    }
+
+    @GetMapping("/{catelogId}/withattr")
+    public R getAttrGroupWithAttrs(@PathVariable Long catelogId) {
+
+        List<AttrGroupWithAttrsVo> attrGroupWithAttrsVos = attrGroupService.getAttrGroupWithAttrsByCatelogId(catelogId);
+
+        return R.ok().put("data", attrGroupWithAttrsVos);
     }
 
     @PostMapping("/attr/relation")
