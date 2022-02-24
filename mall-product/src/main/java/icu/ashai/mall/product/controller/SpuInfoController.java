@@ -23,15 +23,22 @@ import java.util.Map;
 @RestController
 @RequestMapping("product/spuinfo")
 public class SpuInfoController {
+    /**
+     * spu service
+     */
+    private final SpuInfoService spuInfoService;
+
     @Autowired
-    private SpuInfoService spuInfoService;
+    public SpuInfoController(SpuInfoService spuInfoService) {
+        this.spuInfoService = spuInfoService;
+    }
 
     /**
      * 列表
      */
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = spuInfoService.queryPage(params);
+        PageUtils page = spuInfoService.queryPageByCondition(params);
 
         return R.ok().put("page", page);
     }

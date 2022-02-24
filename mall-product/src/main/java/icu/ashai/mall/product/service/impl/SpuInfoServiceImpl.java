@@ -1,5 +1,6 @@
 package icu.ashai.mall.product.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -97,6 +98,25 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         return new PageUtils(page);
     }
 
+    @Override
+    public PageUtils queryPageByCondition(Map<String, Object> params) {
+        String key = (String) params.get("key");
+        String catelogId = (String) params.get("catelogId");
+        String brandId = (String) params.get("brandId");
+        String status = (String) params.get("status");
+
+        IPage<SpuInfoEntity> page = this.page(
+                new Query<SpuInfoEntity>().getPage(params),
+                new LambdaQueryWrapper<SpuInfoEntity>()
+                        .and(StringUtils.isNotBlank(key), keyWrapper -> keyWrapper.eq(SpuInfoEntity::getId, key).or().like(SpuInfoEntity::getSpuName, key))
+                        .eq(StringUtils.isNotBlank(catelogId), SpuInfoEntity::getCatalogId, catelogId)
+                        .eq(StringUtils.isNotBlank(brandId), SpuInfoEntity::getBrandId, brandId)
+                        .eq(StringUtils.isNotBlank(status), SpuInfoEntity::getPublishStatus, status)
+        );
+
+        return new PageUtils(page);
+    }
+
     // TODO: 2/23/2022 9:29 PM Ashai 高级部分完善分布式事务，远程调用等问题
 
     @Override
@@ -174,7 +194,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                     skuImagesEntity.setImgUrl(img.getImgUrl());
                     skuImagesEntity.setDefaultImg(img.getDefaultImg());
                     return skuImagesEntity;
-                }).filter(obj-> StringUtils.isNotBlank(obj.getImgUrl())).collect(Collectors.toList());
+                }).filter(obj -> StringUtils.isNotBlank(obj.getImgUrl())).collect(Collectors.toList());
                 skuImagesService.saveBatch(skuImagesEntities);
 
                 //5、3）、sku的销售属性：pms_sku_sale_attr_value
@@ -191,7 +211,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                 SkuReductionTo skuReductionTo = new SkuReductionTo();
                 BeanUtils.copyProperties(item, skuReductionTo);
                 skuReductionTo.setSkuId(skuInfoEntity.getSkuId());
-                if (skuReductionTo.getFullCount() > 0 || skuReductionTo.getFullPrice().compareTo(BigDecimal.ZERO) > 0){
+                if (skuReductionTo.getFullCount() > 0 || skuReductionTo.getFullPrice().compareTo(BigDecimal.ZERO) > 0) {
                     R r1 = couponFeignService.saveSkuReduction(skuReductionTo);
                     if (r1.getCode() != 0) {
                         log.error("远程保存SKU优惠信息失败");
