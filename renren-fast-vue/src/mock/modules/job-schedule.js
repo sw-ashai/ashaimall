@@ -20,7 +20,7 @@ for (let i = 0; i < Math.floor(Math.random() * 10 + 1); i++) {
 export function list () {
   return {
     // isOpen: false,
-    url: '/sys/schedule/list',
+    url: '/admin/sys/schedule/list',
     type: 'get',
     data: {
       'msg': 'success',
@@ -40,7 +40,7 @@ export function list () {
 export function info () {
   return {
     // isOpen: false,
-    url: '/sys/schedule/info',
+    url: '/admin/sys/schedule/info',
     type: 'get',
     data: {
       'msg': 'success',
@@ -54,7 +54,7 @@ export function info () {
 export function add () {
   return {
     // isOpen: false,
-    url: '/sys/schedule/save',
+    url: '/admin/sys/schedule/save',
     type: 'post',
     data: {
       'msg': 'success',
@@ -67,7 +67,7 @@ export function add () {
 export function update () {
   return {
     // isOpen: false,
-    url: '/sys/schedule/update',
+    url: '/admin/sys/schedule/update',
     type: 'post',
     data: {
       'msg': 'success',
@@ -80,7 +80,7 @@ export function update () {
 export function del () {
   return {
     // isOpen: false,
-    url: '/sys/schedule/delete',
+    url: '/admin/sys/schedule/delete',
     type: 'post',
     data: {
       'msg': 'success',
@@ -93,7 +93,7 @@ export function del () {
 export function run () {
   return {
     // isOpen: false,
-    url: '/sys/schedule/run',
+    url: '/admin/sys/schedule/run',
     type: 'post',
     data: {
       'msg': 'success',
@@ -106,7 +106,7 @@ export function run () {
 export function pause () {
   return {
     // isOpen: false,
-    url: '/sys/schedule/pause',
+    url: '/admin/sys/schedule/pause',
     type: 'post',
     data: {
       'msg': 'success',
@@ -119,7 +119,7 @@ export function pause () {
 export function resume () {
   return {
     // isOpen: false,
-    url: '/sys/schedule/resume',
+    url: '/admin/sys/schedule/resume',
     type: 'post',
     data: {
       'msg': 'success',

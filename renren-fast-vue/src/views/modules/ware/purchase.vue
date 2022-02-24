@@ -124,7 +124,7 @@ export default {
     this.getDataList();
   },
   created() {
-    
+
   },
   methods: {
     opendrawer(row){
@@ -160,7 +160,7 @@ export default {
             type: "success",
             duration: 1500
           });
-          
+
           this.userId = "";
           this.getDataList();
         } else {
@@ -170,7 +170,7 @@ export default {
     },
     getUserList() {
       this.$http({
-        url: this.$http.adornUrl("/sys/user/list"),
+        url: this.$http.adornUrl("/admin/sys/user/list"),
         method: "get",
         params: this.$http.adornParams({
           page: 1,
