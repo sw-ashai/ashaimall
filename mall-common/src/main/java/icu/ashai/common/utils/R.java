@@ -57,6 +57,12 @@ public class R extends HashMap<String, Object> {
 		return new R();
 	}
 
+	public Integer getCode() {
+		return (Integer) this.get("code");
+	}
+
+
+	@Override
 	public R put(String key, Object value) {
 		super.put(key, value);
 		return this;

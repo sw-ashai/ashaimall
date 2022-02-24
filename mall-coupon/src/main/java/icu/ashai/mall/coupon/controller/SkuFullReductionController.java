@@ -1,19 +1,15 @@
 package icu.ashai.mall.coupon.controller;
 
-import java.util.Arrays;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import icu.ashai.mall.coupon.entity.SkuFullReductionEntity;
-import icu.ashai.mall.coupon.service.SkuFullReductionService;
+import icu.ashai.common.to.SkuReductionTo;
 import icu.ashai.common.utils.PageUtils;
 import icu.ashai.common.utils.R;
+import icu.ashai.mall.coupon.entity.SkuFullReductionEntity;
+import icu.ashai.mall.coupon.service.SkuFullReductionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
+import java.util.Map;
 
 
 
@@ -58,6 +54,12 @@ public class SkuFullReductionController {
     public R save(@RequestBody SkuFullReductionEntity skuFullReduction){
 		skuFullReductionService.save(skuFullReduction);
 
+        return R.ok();
+    }
+
+    @PostMapping("/saveInfo")
+    public R saveInfo(@RequestBody SkuReductionTo skuReductionTo){
+        skuFullReductionService.saveSkuReduction(skuReductionTo);
         return R.ok();
     }
 
