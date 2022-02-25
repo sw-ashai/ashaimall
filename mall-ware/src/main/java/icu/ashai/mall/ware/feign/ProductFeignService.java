@@ -1,4 +1,4 @@
-﻿package icu.ashai.mall.ware.feign;
+package icu.ashai.mall.ware.feign;
 
 import icu.ashai.common.utils.R;
 import org.springframework.cloud.openfeign.FeignClient;

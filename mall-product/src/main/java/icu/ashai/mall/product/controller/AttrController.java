@@ -2,13 +2,16 @@ package icu.ashai.mall.product.controller;
 
 import icu.ashai.common.utils.PageUtils;
 import icu.ashai.common.utils.R;
+import icu.ashai.mall.product.entity.ProductAttrValueEntity;
 import icu.ashai.mall.product.service.AttrService;
+import icu.ashai.mall.product.service.ProductAttrValueService;
 import icu.ashai.mall.product.vo.AttrRespVo;
 import icu.ashai.mall.product.vo.AttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 
@@ -25,9 +28,12 @@ public class AttrController {
 
     private final AttrService attrService;
 
+    private final ProductAttrValueService productAttrValueService;
+
     @Autowired
-    public AttrController(AttrService attrService) {
+    public AttrController(AttrService attrService, ProductAttrValueService productAttrValueService) {
         this.attrService = attrService;
+        this.productAttrValueService = productAttrValueService;
     }
 
 
@@ -41,6 +47,27 @@ public class AttrController {
         return R.ok().put("page", page);
     }
 
+    /**
+     * 根据spu id 查询spu规格
+     *
+     * @param spuId spu id
+     * @return result
+     */
+    @GetMapping("/base/listforspu/{spuId}")
+    public R baseAttrListForSpu(@PathVariable String spuId) {
+        List<ProductAttrValueEntity> list = productAttrValueService.baseAttrListForSpu(spuId);
+        return R.ok().put("data", list);
+    }
+
+    /**
+     * 修改
+     */
+    @PostMapping("/update/{spuId}")
+    public R updateSpuAttr(@RequestBody List<ProductAttrValueEntity> entities, @PathVariable Long spuId) {
+        productAttrValueService.updateSpuAttr(spuId, entities);
+
+        return R.ok();
+    }
 
     /**
      * 列表

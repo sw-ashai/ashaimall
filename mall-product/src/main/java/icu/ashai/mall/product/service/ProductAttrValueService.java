@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import icu.ashai.common.utils.PageUtils;
 import icu.ashai.mall.product.entity.ProductAttrValueEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +17,21 @@ import java.util.Map;
 public interface ProductAttrValueService extends IService<ProductAttrValueEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 查询spu规格参数
+     *
+     * @param spuId spu id
+     * @return result
+     */
+    List<ProductAttrValueEntity> baseAttrListForSpu(String spuId);
+
+    /**
+     * 更新spu规格参数
+     *
+     * @param spuId    spu id
+     * @param entities 修改的参数
+     */
+    void updateSpuAttr(Long spuId, List<ProductAttrValueEntity> entities);
 }
 
