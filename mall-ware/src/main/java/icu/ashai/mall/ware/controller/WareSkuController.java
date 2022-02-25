@@ -1,20 +1,14 @@
 package icu.ashai.mall.ware.controller;
 
-import java.util.Arrays;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import icu.ashai.mall.ware.entity.WareSkuEntity;
-import icu.ashai.mall.ware.service.WareSkuService;
 import icu.ashai.common.utils.PageUtils;
 import icu.ashai.common.utils.R;
+import icu.ashai.mall.ware.entity.WareSkuEntity;
+import icu.ashai.mall.ware.service.WareSkuService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.Map;
 
 
 /**
@@ -27,8 +21,16 @@ import icu.ashai.common.utils.R;
 @RestController
 @RequestMapping("ware/waresku")
 public class WareSkuController {
+
+    /**
+     * 仓库sku service
+     */
+    private final WareSkuService wareSkuService;
+
     @Autowired
-    private WareSkuService wareSkuService;
+    public WareSkuController(WareSkuService wareSkuService) {
+        this.wareSkuService = wareSkuService;
+    }
 
     /**
      * 列表

@@ -3,21 +3,21 @@ package icu.ashai.common.constant;
 /**
  * @author Ashai
  * @date 2/22/2022 8:18 PM
- * @Description ²úÆ·Ïà¹Ø³£Á¿
+ * @Description äº§å“ç›¸å…³å¸¸é‡
  */
 public class ProductConstant {
     /**
-     * ÊôĞÔÃ¶¾ÙÀà
+     * å±æ€§æšä¸¾ç±»
      */
     public enum AttrEnum {
         /**
-         * »ù±¾ÊôĞÔ
+         * åŸºæœ¬å±æ€§
          */
-        ATTR_TYPE_BASE(1, "»ù±¾ÊôĞÔ"),
+        ATTR_TYPE_BASE(1, "åŸºæœ¬å±æ€§"),
         /**
-         * ÏúÊÛÊôĞÔ
+         * é”€å”®å±æ€§
          */
-        ATTR_TYPE_SALE(0, "ÏúÊÛÊôĞÔ");
+        ATTR_TYPE_SALE(0, "é”€å”®å±æ€§");
 
         private final int code;
         private final String msg;

@@ -1,25 +1,17 @@
 package icu.ashai.mall.ware.controller;
 
+import icu.ashai.common.utils.PageUtils;
+import icu.ashai.common.utils.R;
+import icu.ashai.mall.ware.entity.PurchaseDetailEntity;
+import icu.ashai.mall.ware.service.PurchaseDetailService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.Arrays;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import icu.ashai.mall.ware.entity.PurchaseDetailEntity;
-import icu.ashai.mall.ware.service.PurchaseDetailService;
-import icu.ashai.common.utils.PageUtils;
-import icu.ashai.common.utils.R;
-
-
 
 /**
- * 
- *
  * @author Ashai
  * @email ashai.cn@gmail.com
  * @date 2021-11-20 15:57:27
@@ -27,8 +19,15 @@ import icu.ashai.common.utils.R;
 @RestController
 @RequestMapping("ware/purchasedetail")
 public class PurchaseDetailController {
+    /**
+     * 采购详情service
+     */
+    private final PurchaseDetailService purchaseDetailService;
+
     @Autowired
-    private PurchaseDetailService purchaseDetailService;
+    public PurchaseDetailController(PurchaseDetailService purchaseDetailService) {
+        this.purchaseDetailService = purchaseDetailService;
+    }
 
     /**
      * 列表
