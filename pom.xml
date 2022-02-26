@@ -30,6 +30,8 @@
         <module>renren-generator</module>
         <module>mall-common</module>
         <module>mall-third-party</module>
+        <module>mall-gateway</module>
+        <module>mall-search</module>
     </modules>
 
 </project>
