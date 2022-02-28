@@ -10,12 +10,14 @@ import icu.ashai.mall.ware.dao.WareSkuDao;
 import icu.ashai.mall.ware.entity.WareSkuEntity;
 import icu.ashai.mall.ware.feign.ProductFeignService;
 import icu.ashai.mall.ware.service.WareSkuService;
+import icu.ashai.mall.ware.vo.SkuHasStockVo;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @Description 仓库sku serivce
@@ -78,6 +80,19 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
         } else {
             this.baseMapper.addStock(skuId, wareId, skuNum);
         }
+    }
+
+    @Override
+    public List<SkuHasStockVo> getSkuHasStock(List<Long> skuIds) {
+
+        return skuIds.stream().map(skuId -> {
+            SkuHasStockVo skuHasStockVo = new SkuHasStockVo();
+            skuHasStockVo.setSkuId(skuId);
+            Long count = baseMapper.getSkuStock(skuId);
+            skuHasStockVo.setHasStock(count != null && count > 0);
+            return skuHasStockVo;
+        }).collect(Collectors.toList());
+
     }
 
 }

@@ -4,10 +4,12 @@ import icu.ashai.common.utils.PageUtils;
 import icu.ashai.common.utils.R;
 import icu.ashai.mall.ware.entity.WareSkuEntity;
 import icu.ashai.mall.ware.service.WareSkuService;
+import icu.ashai.mall.ware.vo.SkuHasStockVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 
@@ -30,6 +32,14 @@ public class WareSkuController {
     @Autowired
     public WareSkuController(WareSkuService wareSkuService) {
         this.wareSkuService = wareSkuService;
+    }
+
+
+    @PostMapping("/hasstock")
+    public R getSkuHasStock(@RequestBody List<Long> skuIds){
+
+         List<SkuHasStockVo> hasStockVos = wareSkuService.getSkuHasStock(skuIds);
+        return R.ok().setData(hasStockVos);
     }
 
     /**

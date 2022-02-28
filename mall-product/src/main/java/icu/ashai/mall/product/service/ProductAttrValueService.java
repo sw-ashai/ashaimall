@@ -24,7 +24,7 @@ public interface ProductAttrValueService extends IService<ProductAttrValueEntity
      * @param spuId spu id
      * @return result
      */
-    List<ProductAttrValueEntity> baseAttrListForSpu(String spuId);
+    List<ProductAttrValueEntity> baseAttrListForSpu(Long spuId);
 
     /**
      * 更新spu规格参数

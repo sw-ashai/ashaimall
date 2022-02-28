@@ -4,14 +4,18 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import icu.ashai.common.constant.ProductConstant;
 import icu.ashai.common.to.SkuReductionTo;
 import icu.ashai.common.to.SpuBoundsTo;
+import icu.ashai.common.to.es.SkuEsModel;
 import icu.ashai.common.utils.PageUtils;
 import icu.ashai.common.utils.Query;
 import icu.ashai.common.utils.R;
 import icu.ashai.mall.product.dao.SpuInfoDao;
 import icu.ashai.mall.product.entity.*;
 import icu.ashai.mall.product.feign.CouponFeignService;
+import icu.ashai.mall.product.feign.SearchFeignService;
+import icu.ashai.mall.product.feign.WareFeignService;
 import icu.ashai.mall.product.service.*;
 import icu.ashai.mall.product.vo.*;
 import org.apache.commons.lang.StringUtils;
@@ -19,11 +23,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.alibaba.fastjson.TypeReference;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -75,8 +78,40 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
      */
     private final CouponFeignService couponFeignService;
 
+    /**
+     * 品牌service
+     */
+    private final BrandService brandService;
+
+    /**
+     * 分类service
+     */
+    private final CategoryService categoryService;
+
+    /**
+     * 库存远程调用
+     */
+    private final WareFeignService wareFeignService;
+
+    /**
+     * 搜索远程调用
+     */
+    private final SearchFeignService searchFeignService;
+
     @Autowired
-    public SpuInfoServiceImpl(SpuInfoDescService spuInfoDescService, SpuImagesService spuImagesService, AttrService attrService, ProductAttrValueService productAttrValueService, SkuInfoService skuInfoService, SkuImagesService skuImagesService, SkuSaleAttrValueService skuSaleAttrValueService, CouponFeignService couponFeignService) {
+    public SpuInfoServiceImpl(SpuInfoDescService spuInfoDescService,
+                              SpuImagesService spuImagesService,
+                              AttrService attrService,
+                              ProductAttrValueService productAttrValueService,
+                              SkuInfoService skuInfoService,
+                              SkuImagesService skuImagesService,
+                              SkuSaleAttrValueService skuSaleAttrValueService,
+                              CouponFeignService couponFeignService,
+                              BrandService brandService,
+                              CategoryService categoryService,
+                              WareFeignService wareFeignService,
+                              SearchFeignService searchFeignService) {
+
         this.spuInfoDescService = spuInfoDescService;
         this.spuImagesService = spuImagesService;
         this.attrService = attrService;
@@ -85,6 +120,10 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         this.skuImagesService = skuImagesService;
         this.skuSaleAttrValueService = skuSaleAttrValueService;
         this.couponFeignService = couponFeignService;
+        this.brandService = brandService;
+        this.categoryService = categoryService;
+        this.wareFeignService = wareFeignService;
+        this.searchFeignService = searchFeignService;
     }
 
 
@@ -116,6 +155,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
         return new PageUtils(page);
     }
+
 
     // TODO: 2/23/2022 9:29 PM Ashai 高级部分完善分布式事务，远程调用等问题
 
@@ -230,5 +270,66 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         this.save(spuInfoEntity);
     }
 
+
+    @Override
+    public void spuUp(Long spuId) {
+
+        SpuInfoEntity spuInfo = this.getById(spuId);
+
+        BrandEntity brandEntity = brandService.getById(spuInfo.getBrandId());
+        CategoryEntity categoryEntity = categoryService.getById(spuInfo.getCatalogId());
+
+        List<ProductAttrValueEntity> baseAttrs = productAttrValueService.baseAttrListForSpu(spuId);
+        List<Long> attrIds = baseAttrs.stream().map(ProductAttrValueEntity::getAttrId).collect(Collectors.toList());
+
+        List<Long> searchAttrIds = attrService.selectSearchAttrIds(attrIds);
+        HashSet<Long> idSet = new HashSet<>(searchAttrIds);
+
+
+        List<SkuEsModel.Attrs> attrsList = baseAttrs.stream().filter(item -> idSet.contains(item.getAttrId())).map(item -> {
+            SkuEsModel.Attrs attrs = new SkuEsModel.Attrs();
+            BeanUtils.copyProperties(item, attrs);
+            return attrs;
+        }).collect(Collectors.toList());
+
+//        1.查出当前spu id对应的所有sku信息，品牌名称
+        List<SkuInfoEntity> skuInfoEntities = skuInfoService.getSkusBySpuId(spuId);
+        List<Long> skuIds = skuInfoEntities.stream().map(SkuInfoEntity::getSkuId).collect(Collectors.toList());
+        Map<Long, Boolean> stockMap = null;
+        try {
+            R r = wareFeignService.getSkuHasStock(skuIds);
+            TypeReference<List<SkuHasStockVo>> typeReference = new TypeReference<List<SkuHasStockVo>>(){};
+            stockMap = r.getData(typeReference).stream().collect(Collectors.toMap(SkuHasStockVo::getSkuId, SkuHasStockVo::getHasStock));
+        } catch (Exception e) {
+            log.error("库存服务查询异常：原因{}", e);
+        }
+
+
+        Map<Long, Boolean> finalStockMap = stockMap;
+        List<SkuEsModel> upProducts = skuInfoEntities.stream().map(item -> {
+            //        组装需要的数据
+            SkuEsModel skuEsModel = new SkuEsModel();
+            BeanUtils.copyProperties(item, skuEsModel);
+            skuEsModel.setSkuPrice(item.getPrice());
+            skuEsModel.setSkuImg(item.getSkuDefaultImg());
+            skuEsModel.setHasStock(finalStockMap != null ? finalStockMap.get(item.getSkuId()) : true);
+            skuEsModel.setHotScore(0L);
+            skuEsModel.setBrandName(brandEntity.getName());
+            skuEsModel.setBrandImg(brandEntity.getLogo());
+            skuEsModel.setCatalogName(categoryEntity.getName());
+            skuEsModel.setAttrs(attrsList);
+            return skuEsModel;
+        }).collect(Collectors.toList());
+
+        R r = searchFeignService.productStatusUp(upProducts);
+        if (r.getCode() == 0) {
+//            调用成功
+            baseMapper.updateSpuStatus(spuId, ProductConstant.StatusEnum.SPU_UP.getCode());
+        } else {
+//            调用失败
+            // TODO: 2/28/2022 9:03 PM Ashai 重复调用问题？ 接口幂等性
+        }
+
+    }
 
 }
