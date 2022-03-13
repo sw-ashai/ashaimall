@@ -3,6 +3,7 @@ package icu.ashai.mall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import icu.ashai.common.utils.PageUtils;
 import icu.ashai.mall.product.entity.CategoryEntity;
+import icu.ashai.mall.product.vo.Catelog2Vo;
 
 import java.util.List;
 import java.util.Map;
@@ -53,5 +54,21 @@ public interface CategoryService extends IService<CategoryEntity> {
      * @return 完整路径
      */
     Long[] findCatelogPath(Long catelogId);
+
+
+    /**
+     * 获取所有的一级分类
+     *
+     * @return List
+     */
+    List<CategoryEntity> getLevel1Categorys();
+
+    /**
+     * 获取分类列表
+     *
+     * @return map
+     */
+    Map<String, List<Catelog2Vo>> getCatalogJson();
+
 }
 
