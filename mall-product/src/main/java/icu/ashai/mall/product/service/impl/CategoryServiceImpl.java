@@ -1,5 +1,7 @@
 package icu.ashai.mall.product.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -13,11 +15,15 @@ import icu.ashai.mall.product.service.CategoryService;
 import icu.ashai.mall.product.vo.Catelog2Vo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -32,9 +38,19 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     private final CategoryBrandRelationService categoryBrandRelationService;
 
+    /**
+     * redis
+     */
+    private final StringRedisTemplate redisTemplate;
+
+    private final RedissonClient redisson;
+
     @Autowired
-    public CategoryServiceImpl(CategoryBrandRelationService categoryBrandRelationService) {
+    public CategoryServiceImpl(CategoryBrandRelationService categoryBrandRelationService,
+                               StringRedisTemplate stringRedisTemplate, RedissonClient redisson) {
         this.categoryBrandRelationService = categoryBrandRelationService;
+        this.redisTemplate = stringRedisTemplate;
+        this.redisson = redisson;
     }
 
     @Override
@@ -101,34 +117,64 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      *
      * @return map
      */
+
     @Override
     public Map<String, List<Catelog2Vo>> getCatalogJson() {
-        long l = System.currentTimeMillis();
+        String catalogJson = redisTemplate.opsForValue().get("catalogJson");
+        if (StringUtils.isBlank(catalogJson)) {
+            return getCatalogJsonFormDb();
+        }
+        return JSON.parseObject(catalogJson, new TypeReference<Map<String, List<Catelog2Vo>>>() {});
 
-//      循环查库 getCatalogJson() 运行时间1890ms
-//        List<CategoryEntity> level1Categorys = getLevel1Categorys();
-//        Map<String, List<Catelog2Vo>> collect = level1Categorys.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), v -> {
-//            List<CategoryEntity> list = this.list(new LambdaQueryWrapper<CategoryEntity>().eq(CategoryEntity::getParentCid, v.getCatId()));
-//            return list.stream().map(item -> {
-//                Catelog2Vo catelog2Vo = new Catelog2Vo();
-//                catelog2Vo.setCatalog1Id(item.getParentCid().toString());
-//                catelog2Vo.setId(item.getCatId().toString());
-//                catelog2Vo.setName(item.getName());
-//                List<CategoryEntity> catalog3 = this.list(new LambdaQueryWrapper<CategoryEntity>().eq(CategoryEntity::getParentCid, item.getCatId()));
-//                List<Catelog2Vo.Catelog3Vo> catelog3Vos = catalog3.stream().map(c -> {
-//                    Catelog2Vo.Catelog3Vo catelog3Vo = new Catelog2Vo.Catelog3Vo();
-//                    catelog3Vo.setCatalog2Id(c.getParentCid().toString());
-//                    catelog3Vo.setName(c.getName());
-//                    catelog3Vo.setId(c.getCatId().toString());
-//                    return catelog3Vo;
-//                }).collect(Collectors.toList());
-//                catelog2Vo.setCatalog3List(catelog3Vos);
-//                return catelog2Vo;
-//            }).collect(Collectors.toList());
-//        }));
+    }
+
+    /**
+     * 获取各级分类
+     *
+     * @return map
+     */
+
+    private synchronized Map<String, List<Catelog2Vo>> getCatalogJsonFormDb() {
+
+        String catalogJson = redisTemplate.opsForValue().get("catalogJson");
+        if (StringUtils.isNotBlank(catalogJson)) {
+            return JSON.parseObject(catalogJson, new TypeReference<Map<String, List<Catelog2Vo>>>() {});
+        }
+
+        Map<String, List<Catelog2Vo>> collect = getDataFormDb();
+
+        catalogJson = JSON.toJSONString(collect);
+        redisTemplate.opsForValue().set("catalogJson", catalogJson, 30, TimeUnit.MINUTES);
+        return collect;
+
+    }
+
+    private  Map<String, List<Catelog2Vo>> getCatalogJsonFormDbWithRedisson() {
+
+        RLock catalogJsonLock = redisson.getLock("catalogJson-lock");
+
+        Map<String, List<Catelog2Vo>> collect;
+        try {
+            catalogJsonLock.lock();
+            String catalogJson = redisTemplate.opsForValue().get("catalogJson");
+            if (StringUtils.isNotBlank(catalogJson)) {
+                return JSON.parseObject(catalogJson, new TypeReference<Map<String, List<Catelog2Vo>>>() {});
+            }
+
+            collect = getDataFormDb();
+
+            catalogJson = JSON.toJSONString(collect);
+            redisTemplate.opsForValue().set("catalogJson", catalogJson, 30, TimeUnit.MINUTES);
+        } finally {
+            catalogJsonLock.unlock();
+        }
+        return collect;
+    }
 
 
-//        getCatalogJson() 运行时间105ms
+
+
+    private Map<String, List<Catelog2Vo>> getDataFormDb() {
         List<CategoryEntity> allCategorys = list();
         List<CategoryEntity> category1List = new ArrayList<>();
         Iterator<CategoryEntity> iterator = allCategorys.iterator();
@@ -159,16 +205,16 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                 while (iterator1.hasNext()) {
                     CategoryEntity category = iterator1.next();
                     if (category.getParentCid().equals(Long.valueOf(catelog2Vo.getId()))) {
-                        catelog3Vos.add(new Catelog2Vo.Catelog3Vo(catelog2Vo.getId(), category.getCatId().toString(), category.getName()));
+                        catelog3Vos.add(new Catelog2Vo.Catelog3Vo(
+                                catelog2Vo.getId(),
+                                category.getCatId().toString(),
+                                category.getName()));
                         iterator1.remove();
                     }
                 }
                 catelog2Vo.setCatalog3List(catelog3Vos);
             }
         }
-
-        log.debug("getCatalogJson() 运行时间{}ms", System.currentTimeMillis() - l);
-
         return collect;
     }
 
