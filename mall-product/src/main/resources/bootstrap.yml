@@ -27,4 +27,9 @@ spring:
     allow-bean-definition-overriding: true
   thymeleaf:
     cache: false
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000
+      cache-null-values: true
 

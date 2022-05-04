@@ -18,6 +18,9 @@ import org.apache.commons.lang.StringUtils;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,6 +84,10 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "category", key = "'level1Category'"),
+            @CacheEvict(cacheNames = "category", key = "'getCatalogJson'")
+    })
     public void updateDetail(CategoryEntity category) {
         this.updateById(category);
         if (StringUtils.isNotEmpty(category.getName())) {
@@ -107,6 +114,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      *
      * @return list
      */
+    @Cacheable(cacheNames = "category", key = "'level1Category'")
     @Override
     public List<CategoryEntity> getLevel1Categorys() {
         return this.list(new LambdaQueryWrapper<CategoryEntity>().eq(CategoryEntity::getParentCid, 0));
@@ -118,14 +126,10 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      * @return map
      */
 
+    @Cacheable(cacheNames = "category", key = "#root.methodName")
     @Override
     public Map<String, List<Catelog2Vo>> getCatalogJson() {
-        String catalogJson = redisTemplate.opsForValue().get("catalogJson");
-        if (StringUtils.isBlank(catalogJson)) {
-            return getCatalogJsonFormDb();
-        }
-        return JSON.parseObject(catalogJson, new TypeReference<Map<String, List<Catelog2Vo>>>() {});
-
+        return getDataFormDb();
     }
 
     /**
