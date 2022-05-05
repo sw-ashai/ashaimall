@@ -7,9 +7,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @Author shiwei
+ * @Author ashai
  * @Date 2022/4/27 20:48
- * @Email shiwei@rmitec.cn
+ * @Email ashai.cn@gmail.com
  * @Description
  */
 @Configuration

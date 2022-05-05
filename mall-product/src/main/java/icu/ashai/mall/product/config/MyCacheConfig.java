@@ -11,9 +11,9 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
- * @Author shiwei
+ * @Author ashai
  * @Date 2022/5/2 23:22
- * @Email shiwei@rmitec.cn
+ * @Email ashai.cn@gmail.com
  * @Description
  */
 @EnableCaching
