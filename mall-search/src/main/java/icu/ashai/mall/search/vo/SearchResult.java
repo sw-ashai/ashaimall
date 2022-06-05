@@ -44,6 +44,8 @@ public class SearchResult {
 	 */
 	private List<CatalogVo> catalogs;
 
+	private List<Integer> pageNavs;
+
 	@Data
 	public static class BrandVo {
 		private Long brandId;

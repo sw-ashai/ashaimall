@@ -30,7 +30,7 @@ public class SearchController {
 	@GetMapping("/list.html")
 	public String listPage(SearchParam searchParam, Model model){
 		 SearchResult result = mallSearchService.search(searchParam);
-		 model.addAttribute(result);
+		 model.addAttribute("result",result);
 		return "list";
 	}
 }
