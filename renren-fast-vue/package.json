@@ -24,7 +24,7 @@
     "gulp-replace": "1.0.0",
     "gulp-shell": "0.8.0",
     "lodash": "4.17.21",
-    "node-sass": "4.13.1",
+    "node-sass": ">=7.0.0",
     "npm": "^6.9.0",
     "pubsub-js": "^1.9.4",
     "sass-loader": "6.0.6",
