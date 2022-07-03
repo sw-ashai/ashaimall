@@ -11,9 +11,11 @@ import icu.ashai.mall.product.service.BrandService;
 import icu.ashai.mall.product.service.CategoryBrandRelationService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -58,6 +60,12 @@ public class BrandServiceImpl extends ServiceImpl<BrandDao, BrandEntity> impleme
 //            更新其他表
             categoryBrandRelationService.updateBrand(brand.getBrandId(), brand.getName());
         }
+    }
+
+    @Cacheable(value = "brand", key = "'brandInfo:'+#root.args[0]")
+    @Override
+    public List<BrandEntity> getBrands(List<Long> brandIds) {
+        return this.listByIds(brandIds);
     }
 
 }

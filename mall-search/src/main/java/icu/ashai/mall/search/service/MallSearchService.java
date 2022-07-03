@@ -4,9 +4,9 @@ import icu.ashai.mall.search.vo.SearchParam;
 import icu.ashai.mall.search.vo.SearchResult;
 
 /**
- * @author shiwei
+ * @author ashai
  * @date 2022/5/5 22:03
- * @email shiwei@rmitec.cn
+ * @email ashai.cn@gmail.com
  * @description 搜索服务
  */
 public interface MallSearchService {

@@ -5,6 +5,7 @@ import icu.ashai.common.utils.R;
 import icu.ashai.mall.product.entity.CategoryEntity;
 import icu.ashai.mall.product.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -22,8 +23,11 @@ import java.util.Map;
 @RestController
 @RequestMapping("product/category")
 public class CategoryController {
+
+    private final CategoryService categoryService;
+
     @Autowired
-    private CategoryService categoryService;
+    public CategoryController(CategoryService categoryService) {this.categoryService = categoryService;}
 
     /**
      * 列表
@@ -40,6 +44,7 @@ public class CategoryController {
      * 信息
      */
     @RequestMapping("/info/{catId}")
+    @Cacheable(value = "category",key = "'catId:'+#root.args[0]")
     public R info(@PathVariable("catId") Long catId) {
         CategoryEntity category = categoryService.getById(catId);
 

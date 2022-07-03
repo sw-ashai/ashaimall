@@ -5,9 +5,9 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * @author shiwei
+ * @author ashai
  * @date 2022/5/5 22:01
- * @email shiwei@rmitec.cn
+ * @email ashai.cn@gmail.com
  * @description 搜索条件
  */
 @Data
@@ -44,6 +44,8 @@ public class SearchParam {
 	 * 页码
 	 */
 	private Integer pageNum;
+
+	private String queryString;
 
 
 }
