@@ -14,6 +14,7 @@ import icu.ashai.mall.product.service.AttrGroupService;
 import icu.ashai.mall.product.service.AttrService;
 import icu.ashai.mall.product.service.CategoryService;
 import icu.ashai.mall.product.vo.AttrGroupWithAttrsVo;
+import icu.ashai.mall.product.vo.SkuItemVo;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,5 +119,12 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
         return getCategoryPath(categoryService.getById(category.getParentCid()), paths);
     }
+
+
+    @Override
+    public List<SkuItemVo.SpuItemAttrGroupVo> getAttrGroupWithAttrsBySpuId(Long spuId, Long catalogId) {
+        return baseMapper.getAttrsGroupWithAttrsBySpuId(spuId,catalogId);
+    }
+
 
 }

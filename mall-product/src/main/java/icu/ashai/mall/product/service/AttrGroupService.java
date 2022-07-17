@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import icu.ashai.common.utils.PageUtils;
 import icu.ashai.mall.product.entity.AttrGroupEntity;
 import icu.ashai.mall.product.vo.AttrGroupWithAttrsVo;
+import icu.ashai.mall.product.vo.SkuItemVo;
 
 import java.util.List;
 import java.util.Map;
@@ -49,5 +50,10 @@ public interface AttrGroupService extends IService<AttrGroupEntity> {
      * @return 属性分组以属性分组下所有属性的列表
      */
     List<AttrGroupWithAttrsVo> getAttrGroupWithAttrsByCatelogId(Long catelogId);
+
+    /**
+     * 根据spuId获取属性分组信息
+     */
+    List<SkuItemVo.SpuItemAttrGroupVo> getAttrGroupWithAttrsBySpuId(Long spuId, Long catalogId);
 }
 

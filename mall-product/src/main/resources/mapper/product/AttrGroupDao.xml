@@ -3,7 +3,7 @@
 
 <mapper namespace="icu.ashai.mall.product.dao.AttrGroupDao">
 
-	<!-- 可根据自己的需求，是否要使用 -->
+    <!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="icu.ashai.mall.product.entity.AttrGroupEntity" id="attrGroupMap">
         <result property="attrGroupId" column="attr_group_id"/>
         <result property="attrGroupName" column="attr_group_name"/>
@@ -12,6 +12,28 @@
         <result property="icon" column="icon"/>
         <result property="catelogId" column="catelog_id"/>
     </resultMap>
+    <resultMap id="spuItemAttrGroupVo" type="icu.ashai.mall.product.vo.SkuItemVo$SpuItemAttrGroupVo">
+        <result property="groupName" column="attr_group_name"/>
+        <collection property="attrs" ofType="icu.ashai.mall.product.vo.SkuItemVo$SpuBaseAttrVo">
+            <result property="attrName" column="attr_name"/>
+            <result property="attrValue" column="attr_value"/>
+        </collection>
+    </resultMap>
+
+    <select id="getAttrsGroupWithAttrsBySpuId" resultMap="spuItemAttrGroupVo">
+        select pav.spu_id,
+               ag.attr_group_name groupName,
+               ag.attr_group_id,
+               attr.attr_id,
+               attr.attr_name,
+               pav.attr_value
+        from pms_attr_group ag
+                 left join pms_attr_attrgroup_relation aar on ag.attr_group_id = aar.attr_group_id
+                 left join pms_attr attr on aar.attr_id = attr.attr_id
+                 left join pms_product_attr_value pav on aar.attr_id = pav.attr_id
+        where ag.catelog_id = #{catalogId}
+          and pav.spu_id = #{spuId}
+    </select>
 
 
 </mapper>

@@ -32,4 +32,8 @@ spring:
     redis:
       time-to-live: 3600000
       cache-null-values: true
-
+ashaimall:
+  thread:
+    core-size: 20
+    max-size: 200
+    keep-alive-time: 10
