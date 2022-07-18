@@ -32,6 +32,7 @@
         <module>mall-third-party</module>
         <module>mall-gateway</module>
         <module>mall-search</module>
+        <module>mall-auth-server</module>
     </modules>
 
 </project>
