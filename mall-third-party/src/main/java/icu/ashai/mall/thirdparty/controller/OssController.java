@@ -5,7 +5,8 @@ import com.aliyun.oss.common.utils.BinaryUtil;
 import com.aliyun.oss.model.MatchMode;
 import com.aliyun.oss.model.PolicyConditions;
 import icu.ashai.common.utils.R;
-import org.springframework.beans.factory.annotation.Value;
+import icu.ashai.mall.thirdparty.config.AliCloudConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,19 +30,13 @@ public class OssController {
     @Resource
     private OSSClient ossClient;
 
-    @Value("${spring.cloud.alicloud.oss.endpoint}")
-    private String endpoint;
-
-    @Value("${spring.cloud.alicloud.oss.bucket}")
-    private String bucket;
-
-    @Value("${spring.cloud.alicloud.access-key}")
-    private String accessId;
+    @Autowired
+    private AliCloudConfig aliCloudConfig;
 
     @GetMapping("/oss/policy")
     public R policy() {
 
-        String host = "https://" + bucket + "." + endpoint;
+        String host = "https://" + aliCloudConfig.getOss().getBucket() + "." + aliCloudConfig.getOss().getEndpoint();
         // callbackUrl为上传回调服务器的URL，请将下面的IP和Port配置为您自己的真实信息。
 //        String callbackUrl = "http://88.88.88.88:8888";
         String format = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
@@ -63,7 +58,7 @@ public class OssController {
             String postSignature = ossClient.calculatePostSignature(postPolicy);
 
             respMap = new LinkedHashMap<String, String>();
-            respMap.put("accessid", accessId);
+            respMap.put("accessid", aliCloudConfig.getAccessKey());
             respMap.put("policy", encodedPolicy);
             respMap.put("signature", postSignature);
             respMap.put("dir", dir);
